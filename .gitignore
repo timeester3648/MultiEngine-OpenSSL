@@ -256,3 +256,9 @@ doc-nits
 # LSP (Language Server Protocol) support
 .cache/
 compile_commands.json
+
+# exclude project files
+**.sln
+**.vcxproj
+**.vcxproj.user
+**.vcxproj.filters
