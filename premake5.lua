@@ -50,6 +50,9 @@ project "OpenSSL"
 
 		"./crypto/md2/**",
 		"./crypto/rc5/**",
+		"./crypto/evp/**md2**",
+
+		"./**riscv**"
 	}
 
 	filter "toolset:msc"
@@ -69,6 +72,7 @@ project "OpenSSL"
 		}
 
 		excludes {
+			"./crypto/ppccap.c",
 			"./crypto/s390xcap.c",
 			"./crypto/sparcv9cap.c",
 			"./crypto/loongarchcap.c",
@@ -79,13 +83,25 @@ project "OpenSSL"
 			"./crypto/poly1305/poly1305_ieee754.c",
 			"./crypto/poly1305/poly1305_base2_44.c",
 
-			"**LPdir**",
+			"./**gcc**",
+			"./**arm**",
+			"./**sparc**",
+			"./**LPdir**",
 
 			"./crypto/**_vms.c",
 			"./crypto/**_unix.c",
 
+			"./crypto/sha/sha_ppc.c",
+			"./crypto/aes/aes_cbc.c",
+			"./crypto/des/ncbc_enc.c",
+			"./crypto/rc4/rc4_skey.c",
+			"./crypto/sha/keccak1600.c",
+			"./crypto/aes/aes_x86core.c",
+			"./crypto/chacha/chacha_ppc.c",
+			"./crypto/camellia/camellia.c",
+			"./crypto/poly1305/poly1305_ppc.c",
 			
-			"./ssl/ktls_**.c",
+			"./ssl/record/methods/ktls_**.c",
 		}
 
 		files {
@@ -96,7 +112,7 @@ project "OpenSSL"
 		buildmessage "Generating build info"
 
 		buildcommands {
-			"perl \"-I.\" \"-Iutil\\perl\" \"-Iproviders\\common\\der\" \"-Mconfigdata\" \"-MOpenSSL::paramnames\" \"-Moids_to_c\" \"util\\dofile.pl\" \"-omakefile\" \"VC-WIN64A\"> .\\crypto\\buildinf.h"
+			"perl \"util\\mkbuildinf.pl\" \"MultiEngine-CmdLine\" \"VC-WIN64A\"> .\\crypto\\buildinf.h"
 		}
 
 		buildoutputs { ".\\crypto\\buildinf.h" }
