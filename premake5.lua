@@ -29,35 +29,59 @@ project "OpenSSL"
 		"./crypto/**.h",
 		"./crypto/**.c",
 
+		"./providers/common/**.c",
+		"./providers/implementations/ciphers/**.c",
+		"./providers/implementations/digests/**.c",
+
 		"./engines/e_capi.c",
 		"./engines/e_padlock.c",
 
-		"./providers/*.h",
-		"./providers/baseprov.c",
-		"./providers/nullprov.c",
-		"./providers/defltprov.c",
-		"./providers/prov_running.c",
-		"./providers/implementations/asymciphers/rsa_enc.c",
+		"./providers/**.h",
+		"./providers/**.c",
 
 		"./**.h.in",
 		"./**x86_64.pl",
-		"./util/mkbuildinf.pl"
+		"./crypto/**.c.in",
+		"./providers/common/der/**.c.in",
+
+		"./util/mkbuildinf.pl",
+
+		
+		-- Note: needed because generated non-obj files do not get taken into account
+		"./crypto/params_idx.c",
+		"./providers/common/der/der_digests_gen.c",
+		"./providers/common/der/der_dsa_gen.c",
+		"./providers/common/der/der_ec_gen.c",
+		"./providers/common/der/der_ecx_gen.c",
+		"./providers/common/der/der_rsa_gen.c",
+		"./providers/common/der/der_sm2_gen.c",
+		"./providers/common/der/der_wrap_gen.c"
 	}
 
 	excludes {
+		"./providers/legacyprov.c",
 		"./crypto/ec/ecp_nistz256_table.c",
 		"./crypto/rsa/rsa_acvp_test_params.c",
+		"./providers/implementations/macs/blake2_mac_impl.c",
+		"./providers/implementations/rands/seeding/rand_vms.c",
+		"./providers/implementations/rands/seeding/rand_vxworks.c",
 
 		"./crypto/md2/**",
 		"./crypto/rc5/**",
 		"./crypto/evp/**md2**",
 
+		"./providers/fips/**",
+		"./providers/common/**fips**.c",
+		"./providers/implementations/**rc5**",
+		"./providers/implementations/**md2**",
+
 		"./**riscv**"
 	}
 
 	filter "toolset:msc"
-		disablewarnings { "4311", "4996", "4267", "4244", "4305", "4013", "4133", "4334" }
+		disablewarnings { "4311", "4996", "4267", "4244", "4305", "4013", "4133", "4334", "4090" }
 
+	-- TODO: also other platforms
 	filter "system:windows"
 		defines {
 			"WIN32_LEAN_AND_MEAN",
@@ -82,30 +106,37 @@ project "OpenSSL"
 			"./crypto/ec/ecp_nistp384.c",
 			"./crypto/poly1305/poly1305_ieee754.c",
 			"./crypto/poly1305/poly1305_base2_44.c",
-
+			
 			"./**gcc**",
 			"./**arm**",
 			"./**sparc**",
 			"./**LPdir**",
-
+			
 			"./crypto/**_vms.c",
 			"./crypto/**_unix.c",
 
+			"./crypto/ec/ecp_ppc.c",
 			"./crypto/sha/sha_ppc.c",
 			"./crypto/aes/aes_cbc.c",
+			"./crypto/rc4/rc4_enc.c",
+			"./crypto/aes/aes_core.c",
 			"./crypto/des/ncbc_enc.c",
 			"./crypto/rc4/rc4_skey.c",
 			"./crypto/sha/keccak1600.c",
 			"./crypto/aes/aes_x86core.c",
+			"./crypto/whrlpool/wp_block.c",
 			"./crypto/chacha/chacha_ppc.c",
+			"./crypto/chacha/chacha_enc.c",
 			"./crypto/camellia/camellia.c",
+			"./crypto/camellia/cmll_cbc.c",
 			"./crypto/poly1305/poly1305_ppc.c",
 			
 			"./ssl/record/methods/ktls_**.c",
 		}
 
 		files {
-			"./ms/uplink.c"
+			"./ms/uplink.c",
+			"./providers/implementations/rands/seeding/rand_win.c",
 		}
 
 	filter { "system:windows", "files:**mkbuildinf.pl" }
@@ -117,8 +148,16 @@ project "OpenSSL"
 
 		buildoutputs { ".\\crypto\\buildinf.h" }
 
-	-- TODO: also other platforms
 	filter { "system:windows", "files:**.h.in" }
+		buildmessage "Generating %{file.basename}"
+
+		buildcommands {
+			"perl \"-I.\" \"-Iutil\\perl\" \"-Iproviders\\common\\der\" \"-Mconfigdata\" \"-MOpenSSL::paramnames\" \"-Moids_to_c\" \"util\\dofile.pl\" \"-omakefile\" %{file.relpath} > %{file.reldirectory}\\%{file.basename}"
+		}
+
+		buildoutputs { "%{file.reldirectory}\\%{file.basename}" }
+
+	filter { "system:windows", "files:**.c.in" }
 		buildmessage "Generating %{file.basename}"
 
 		buildcommands {
