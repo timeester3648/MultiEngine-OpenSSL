@@ -34,7 +34,6 @@ project "OpenSSL"
 		"./providers/implementations/digests/**.c",
 
 		"./engines/e_capi.c",
-		"./engines/e_padlock.c",
 
 		"./providers/**.h",
 		"./providers/**.c",
@@ -44,8 +43,8 @@ project "OpenSSL"
 		"./crypto/**.c.in",
 		"./providers/common/der/**.c.in",
 
+		"./configdata.pm.in",
 		"./util/mkbuildinf.pl",
-
 		
 		-- Note: needed because generated non-obj files do not get taken into account
 		"./crypto/params_idx.c",
@@ -75,7 +74,18 @@ project "OpenSSL"
 		"./providers/implementations/**rc5**",
 		"./providers/implementations/**md2**",
 
-		"./**riscv**"
+		"./**riscv**",
+
+		-- Note: dependencies not needed
+		"./cloudflare-quiche/**",
+		"./gost-engine/**",
+		"./krb5/**",
+		"./oqs-provider/**",
+		"./pyca-cryptography/**",
+		"./python-ecdsa/**",
+		"./tlsfuzzer/**",
+		"./tlslite-ng/**",
+		"./wycheproof/**"
 	}
 
 	filter "toolset:msc"
@@ -139,11 +149,20 @@ project "OpenSSL"
 			"./providers/implementations/rands/seeding/rand_win.c",
 		}
 
+	filter { "system:windows", "files:**configdata.pm.in" }
+		buildmessage "Configuring"
+
+		buildcommands {
+			"perl Configure VC-WIN64A --prefix=%{cfg.buildtarget.directory} --openssldir=%{cfg.buildtarget.directory}"
+		}
+
+		buildoutputs { ".\\configdata.pm" }
+
 	filter { "system:windows", "files:**mkbuildinf.pl" }
 		buildmessage "Generating build info"
 
 		buildcommands {
-			"perl \"util\\mkbuildinf.pl\" \"MultiEngine-CmdLine\" \"VC-WIN64A\"> .\\crypto\\buildinf.h"
+			"perl \"-I.\" \"util\\mkbuildinf.pl\" \"MultiEngine-CmdLine\" \"VC-WIN64A\"> .\\crypto\\buildinf.h"
 		}
 
 		buildoutputs { ".\\crypto\\buildinf.h" }
@@ -173,9 +192,4 @@ project "OpenSSL"
 			"set ASM=ml64 && perl %{file.relpath} masm %{cfg.objdir}/%{file.basename}.asm && ml64 /c /Cp /Cx /nologo /Zi /Fo%{cfg.objdir}/%{file.basename}.obj %{cfg.objdir}/%{file.basename}.asm"
 		}
 
-		buildoutputs { "%{cfg.objdir}/%{file.basename}.asm", "%{cfg.objdir}/%{file.basename}.obj" }
-
-		
-
-
-	
+		buildoutputs { "%{cfg.objdir}/%{file.basename}.asm", "%{cfg.objdir}/%{file.basename}.obj" }	
