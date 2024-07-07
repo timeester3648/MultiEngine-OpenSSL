@@ -2,9 +2,9 @@ void main(MultiBuild::Workspace& workspace) {
 	auto project = workspace.create_project(".");
 	auto properties = project.properties();
 
-	properties.name("OpenSSL");
+	project.name("OpenSSL");
 	properties.binary_object_kind(MultiBuild::BinaryObjectKind::eStaticLib);
-	properties.license("./LICENSE.txt");
+	project.license("./LICENSE.txt");
 	properties.tags("use_header_only_mle");
 
 	properties.project_includes({
