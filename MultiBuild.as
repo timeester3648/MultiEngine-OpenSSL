@@ -62,7 +62,7 @@ void main(MultiBuild::Workspace& workspace) {
 		"./providers/implementations/include"
 	});
 
-	properties.exclude_files({
+	properties.excluded_files({
 		"./providers/legacyprov.c",
 		"./crypto/ec/ecp_nistz256_table.c",
 		"./crypto/rsa/rsa_acvp_test_params.c",
@@ -112,7 +112,7 @@ void main(MultiBuild::Workspace& workspace) {
 			"MODULESDIR=\".\""
 		});
 
-		properties.exclude_files({
+		properties.excluded_files({
 			"./crypto/ppccap.c",
 			"./crypto/s390xcap.c",
 			"./crypto/sparcv9cap.c",
