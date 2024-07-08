@@ -94,12 +94,12 @@ void main(MultiBuild::Workspace& workspace) {
 	});
 
 	{
-		MultiBuild::ScopedFilter _(workspace, "project.compiler:VisualCpp");
+		MultiBuild::ScopedFilter _(project, "project.compiler:VisualCpp");
 		properties.disable_warnings({ "4311", "4996", "4267", "4244", "4305", "4013", "4133", "4334", "4090" });
 	}
 
 	{
-		MultiBuild::ScopedFilter _(workspace, "config.platform:Windows");
+		MultiBuild::ScopedFilter _(project, "config.platform:Windows");
 		properties.defines({
 			"WIN32_LEAN_AND_MEAN",
 			"OPENSSL_PIC",
@@ -158,7 +158,7 @@ void main(MultiBuild::Workspace& workspace) {
 	}
 
 	{
-		MultiBuild::ScopedFilter _(workspace, "config.platform:Windows && file:**configdata.pm.in");
+		MultiBuild::ScopedFilter _(project, "config.platform:Windows && file:**configdata.pm.in");
 
 		properties.build_message("Configuring");
 		properties.build_commands("perl Configure VC-WIN64A --prefix={:project.target_dir --openssldir={:project.target_dir}");
@@ -166,7 +166,7 @@ void main(MultiBuild::Workspace& workspace) {
 	}
 
 	{
-		MultiBuild::ScopedFilter _(workspace, "config.platform:Windows && file:**mkbuildinf.pl");
+		MultiBuild::ScopedFilter _(project, "config.platform:Windows && file:**mkbuildinf.pl");
 
 		properties.build_message("Generating build info");
 		properties.build_commands("perl \"-I.\" \"util\\mkbuildinf.pl\" \"MultiEngine-CmdLine\" \"VC-WIN64A\"> .\\crypto\\buildinf.h");
@@ -174,7 +174,7 @@ void main(MultiBuild::Workspace& workspace) {
 	}
 
 	{
-		MultiBuild::ScopedFilter _(workspace, "config.platform:Windows && file:**.h.in");
+		MultiBuild::ScopedFilter _(project, "config.platform:Windows && file:**.h.in");
 
 		properties.build_message("Generating {:file.stem}");
 		properties.build_commands("perl \"-I.\" \"-Iutil\\perl\" \"-Iproviders\\common\\der\" \"-Mconfigdata\" \"-MOpenSSL::paramnames\" \"-Moids_to_c\" \"util\\dofile.pl\" \"-omakefile\" {:file.path} > {:file.location}\\{:file.stem}");
@@ -182,7 +182,7 @@ void main(MultiBuild::Workspace& workspace) {
 	}
 
 	{
-		MultiBuild::ScopedFilter _(workspace, "config.platform:Windows && file:**.c.in");
+		MultiBuild::ScopedFilter _(project, "config.platform:Windows && file:**.c.in");
 
 		properties.build_message("Generating {:file.stem}");
 		properties.build_commands("perl \"-I.\" \"-Iutil\\perl\" \"-Iproviders\\common\\der\" \"-Mconfigdata\" \"-MOpenSSL::paramnames\" \"-Moids_to_c\" \"util\\dofile.pl\" \"-omakefile\" {:file.path} > {:file.location}\\{:file.stem}");
@@ -190,7 +190,7 @@ void main(MultiBuild::Workspace& workspace) {
 	}
 
 	{
-		MultiBuild::ScopedFilter _(workspace, "config.platform:Windows && file:**x86_64.pl");
+		MultiBuild::ScopedFilter _(project, "config.platform:Windows && file:**x86_64.pl");
 
 		properties.build_message("Compiling {:file.stem}.asm");
 		properties.build_commands("set ASM=ml64 && perl {:file.path} masm {:project.obj_dir}/{:file.stem}.asm && ml64 /c /Cp /Cx /nologo /Zi /Fo{:project.obj_dir}/{:file.stem}.obj {:project.obj_dir}/{:file.stem}.asm");
