@@ -194,6 +194,6 @@ void main(MultiBuild::Workspace& workspace) {
 
 		properties.build_message("Compiling {:file.stem}.asm");
 		properties.build_commands("set ASM=ml64 && perl {:file.path} masm {:project.obj_dir}/{:file.stem}.asm && ml64 /c /Cp /Cx /nologo /Zi /Fo{:project.obj_dir}/{:file.stem}.obj {:project.obj_dir}/{:file.stem}.asm");
-		properties.build_outputs({ "{project.obj_dir}/{:file.stem}.asm", "{project.obj_dir}/{:file.stem}.obj" }	);
+		properties.build_outputs({ "{:project.obj_dir}/{:file.stem}.asm", "{:project.obj_dir}/{:file.stem}.obj" }	);
 	}
 }
