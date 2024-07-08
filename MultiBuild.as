@@ -161,7 +161,7 @@ void main(MultiBuild::Workspace& workspace) {
 		MultiBuild::ScopedFilter _(project, "config.platform:Windows && file.path:**configdata.pm.in");
 
 		properties.build_message("Configuring");
-		properties.build_commands("perl Configure VC-WIN64A --prefix={:project.target_dir --openssldir={:project.target_dir}");
+		properties.build_commands("perl Configure VC-WIN64A --prefix={:project.target_dir} --openssldir={:project.target_dir}");
 		properties.build_outputs(".\\configdata.pm");
 	}
 
