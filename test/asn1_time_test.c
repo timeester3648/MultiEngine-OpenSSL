@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2022 The OpenSSL Project Authors. All Rights Reserved.
+ * Copyright 1999-2024 The OpenSSL Project Authors. All Rights Reserved.
  *
  * Licensed under the Apache License 2.0 (the "License").  You may not use
  * this file except in compliance with the License.  You can obtain a copy
@@ -434,10 +434,10 @@ static int convert_asn1_to_time_t(int idx)
 {
     time_t testdateutc;
 
-    testdateutc = ossl_asn1_string_to_time_t(asn1_to_utc[idx].input);
+    testdateutc = test_asn1_string_to_time_t(asn1_to_utc[idx].input);
 
     if (!TEST_time_t_eq(testdateutc, asn1_to_utc[idx].expected)) {
-        TEST_info("ossl_asn1_string_to_time_t (%s) failed: expected %lli, got %lli\n",
+        TEST_info("test_asn1_string_to_time_t (%s) failed: expected %lli, got %lli\n",
                   asn1_to_utc[idx].input,
                   (long long int)asn1_to_utc[idx].expected,
                   (long long int)testdateutc);

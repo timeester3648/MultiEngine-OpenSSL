@@ -41,12 +41,6 @@ typedef unsigned int u_int;
 # include "s_apps.h"
 # include "internal/sockets.h"
 
-# if defined(__TANDEM)
-#  if defined(OPENSSL_TANDEM_FLOSS)
-#   include <floss.h(floss_read)>
-#  endif
-# endif
-
 # include <openssl/bio.h>
 # include <openssl/err.h>
 
@@ -89,9 +83,6 @@ int init_client(int *sock, const char *host, const char *port,
     int found = 0;
     int ret;
     int options = 0;
-
-    if (tfo && ba_ret != NULL)
-        *ba_ret = NULL;
 
     if (BIO_sock_init() != 1)
         return 0;

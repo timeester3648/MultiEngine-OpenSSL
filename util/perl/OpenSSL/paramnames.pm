@@ -1,5 +1,5 @@
 #! /usr/bin/env perl
-# Copyright 2023 The OpenSSL Project Authors. All Rights Reserved.
+# Copyright 2023-2024 The OpenSSL Project Authors. All Rights Reserved.
 #
 # Licensed under the Apache License 2.0 (the "License").  You may not use
 # this file except in compliance with the License.  You can obtain a copy
@@ -32,7 +32,23 @@ my %params = (
     'PROV_PARAM_STATUS' =>             "status",             # uint
     'PROV_PARAM_SECURITY_CHECKS' =>    "security-checks",    # uint
     'PROV_PARAM_TLS1_PRF_EMS_CHECK' => "tls1-prf-ems-check", # uint
+    'PROV_PARAM_NO_SHORT_MAC' =>       "no-short-mac",       # uint
     'PROV_PARAM_DRBG_TRUNC_DIGEST' =>  "drbg-no-trunc-md",   # uint
+    'PROV_PARAM_HKDF_DIGEST_CHECK' =>      "hkdf-digest-check",      # uint
+    'PROV_PARAM_TLS13_KDF_DIGEST_CHECK' => "tls13-kdf-digest-check", # uint
+    'PROV_PARAM_TLS1_PRF_DIGEST_CHECK' =>  "tls1-prf-digest-check",  # uint
+    'PROV_PARAM_SSHKDF_DIGEST_CHECK' =>    "sshkdf-digest-check",    # uint
+    'PROV_PARAM_SSKDF_DIGEST_CHECK' =>     "sskdf-digest-check",     # uint
+    'PROV_PARAM_X963KDF_DIGEST_CHECK' =>   "x963kdf-digest-check",   # uint
+    'PROV_PARAM_DSA_SIGN_DISABLED' =>      "dsa-sign-disabled",      # uint
+    'PROV_PARAM_TDES_ENCRYPT_DISABLED' =>  "tdes-encrypt-disabled",  # uint
+    'PROV_PARAM_RSA_SIGN_X931_PAD_DISABLED' =>  "rsa-sign-x931-pad-disabled",   # uint
+    'PROV_PARAM_HKDF_KEY_CHECK' =>         "hkdf-key-check",         # uint
+    'PROV_PARAM_TLS13_KDF_KEY_CHECK' =>    "tls13-kdf-key-check",    # uint
+    'PROV_PARAM_TLS1_PRF_KEY_CHECK' =>     "tls1-prf-key-check",     # uint
+    'PROV_PARAM_SSHKDF_KEY_CHECK' =>       "sshkdf-key-check",       # uint
+    'PROV_PARAM_SSKDF_KEY_CHECK' =>        "sskdf-key-check",        # uint
+    'PROV_PARAM_X963KDF_KEY_CHECK' =>      "x963kdf-key-check",      # uint
 
 # Self test callback parameters
     'PROV_PARAM_SELF_TEST_PHASE' =>  "st-phase",# utf8_string
@@ -67,6 +83,7 @@ my %params = (
     'ALG_PARAM_ENGINE' =>       "engine",       # utf8_string
     'ALG_PARAM_MAC' =>          "mac",          # utf8_string
     'ALG_PARAM_PROPERTIES' =>   "properties",   # utf8_string
+    'ALG_PARAM_FIPS_APPROVED_INDICATOR' => 'fips-indicator',   # int, -1, 0 or 1
 
 # cipher parameters
     'CIPHER_PARAM_PADDING' =>              "padding",     # uint
@@ -100,6 +117,9 @@ my %params = (
     'CIPHER_PARAM_RC2_KEYBITS' =>          "keybits",     # size_t
     'CIPHER_PARAM_SPEED' =>                "speed",       # uint
     'CIPHER_PARAM_CTS_MODE' =>             "cts_mode",    # utf8_string
+    'CIPHER_PARAM_DECRYPT_ONLY' =>         "decrypt-only",  # int, 0 or 1
+    'CIPHER_PARAM_FIPS_ENCRYPT_CHECK' =>   "encrypt-check", # int
+    'CIPHER_PARAM_FIPS_APPROVED_INDICATOR' => '*ALG_PARAM_FIPS_APPROVED_INDICATOR',
 # For passing the AlgorithmIdentifier parameter in DER form
     'CIPHER_PARAM_ALGORITHM_ID_PARAMS' =>  "alg_id_param",# octet_string
     'CIPHER_PARAM_XTS_STANDARD' =>         "xts_standard",# utf8_string
@@ -143,6 +163,7 @@ my %params = (
     'MAC_PARAM_SIZE' =>             "size",                     # size_t
     'MAC_PARAM_BLOCK_SIZE' =>       "block-size",               # size_t
     'MAC_PARAM_TLS_DATA_SIZE' =>    "tls-data-size",            # size_t
+    'MAC_PARAM_FIPS_APPROVED_INDICATOR' => '*ALG_PARAM_FIPS_APPROVED_INDICATOR',
 
 # KDF / PRF parameters
     'KDF_PARAM_SECRET' =>       "secret",                   # octet string
@@ -191,6 +212,10 @@ my %params = (
     'KDF_PARAM_ARGON2_LANES' =>   "lanes",                  # uint32_t
     'KDF_PARAM_ARGON2_MEMCOST' => "memcost",                # uint32_t
     'KDF_PARAM_ARGON2_VERSION' => "version",                # uint32_t
+    'KDF_PARAM_FIPS_EMS_CHECK' => "ems_check",              # int
+    'KDF_PARAM_FIPS_DIGEST_CHECK' => '*PKEY_PARAM_FIPS_DIGEST_CHECK',
+    'KDF_PARAM_FIPS_KEY_CHECK' => '*PKEY_PARAM_FIPS_KEY_CHECK',
+    'KDF_PARAM_FIPS_APPROVED_INDICATOR' => '*ALG_PARAM_FIPS_APPROVED_INDICATOR',
 
 # Known RAND names
     'RAND_PARAM_STATE' =>                   "state",
@@ -199,6 +224,7 @@ my %params = (
     'RAND_PARAM_TEST_ENTROPY' =>            "test_entropy",
     'RAND_PARAM_TEST_NONCE' =>              "test_nonce",
     'RAND_PARAM_GENERATE' =>                "generate",
+    'RAND_PARAM_FIPS_APPROVED_INDICATOR' => '*ALG_PARAM_FIPS_APPROVED_INDICATOR',
 
 # RAND/DRBG names
     'DRBG_PARAM_RESEED_REQUESTS' =>         "reseed_requests",
@@ -216,6 +242,8 @@ my %params = (
     'DRBG_PARAM_CIPHER' =>                  '*ALG_PARAM_CIPHER',
     'DRBG_PARAM_MAC' =>                     '*ALG_PARAM_MAC',
     'DRBG_PARAM_USE_DF' =>                  "use_derivation_function",
+    'DRBG_PARAM_FIPS_DIGEST_CHECK' =>       '*PKEY_PARAM_FIPS_DIGEST_CHECK',
+    'DRBG_PARAM_FIPS_APPROVED_INDICATOR' => '*ALG_PARAM_FIPS_APPROVED_INDICATOR',
 
 # DRBG call back parameters
     'DRBG_PARAM_ENTROPY_REQUIRED' =>        "entropy_required",
@@ -247,6 +275,8 @@ my %params = (
     'PKEY_PARAM_PUB_KEY' =>             "pub",
     'PKEY_PARAM_PRIV_KEY' =>            "priv",
     'PKEY_PARAM_IMPLICIT_REJECTION' =>  "implicit-rejection",
+    'PKEY_PARAM_FIPS_DIGEST_CHECK' =>   "digest-check",
+    'PKEY_PARAM_FIPS_KEY_CHECK' =>      "key-check",
 
 # Diffie-Hellman/DSA Parameters
     'PKEY_PARAM_FFC_P' =>               "p",
@@ -374,6 +404,9 @@ my %params = (
     'EXCHANGE_PARAM_KDF_OUTLEN' =>            "kdf-outlen",# size_t
 # The following parameter is an octet_string on set and an octet_ptr on get
     'EXCHANGE_PARAM_KDF_UKM' =>               "kdf-ukm",
+    'EXCHANGE_PARAM_FIPS_DIGEST_CHECK' =>     '*PKEY_PARAM_FIPS_DIGEST_CHECK',
+    'EXCHANGE_PARAM_FIPS_KEY_CHECK' =>        '*PKEY_PARAM_FIPS_KEY_CHECK',
+    'EXCHANGE_PARAM_FIPS_APPROVED_INDICATOR' => '*ALG_PARAM_FIPS_APPROVED_INDICATOR',
 
 # Signature parameters
     'SIGNATURE_PARAM_ALGORITHM_ID' =>       "algorithm-id",
@@ -387,6 +420,11 @@ my %params = (
     'SIGNATURE_PARAM_NONCE_TYPE' =>         "nonce-type",
     'SIGNATURE_PARAM_INSTANCE' =>           "instance",
     'SIGNATURE_PARAM_CONTEXT_STRING' =>     "context-string",
+    'SIGNATURE_PARAM_FIPS_DIGEST_CHECK' =>  '*PKEY_PARAM_FIPS_DIGEST_CHECK',
+    'SIGNATURE_PARAM_FIPS_KEY_CHECK' =>     '*PKEY_PARAM_FIPS_KEY_CHECK',
+    'SIGNATURE_PARAM_FIPS_SIGN_CHECK' =>    "sign-check",
+    'SIGNATURE_PARAM_FIPS_SIGN_X931_PAD_CHECK' => "sign-x931-pad-check",
+    'SIGNATURE_PARAM_FIPS_APPROVED_INDICATOR' => '*ALG_PARAM_FIPS_APPROVED_INDICATOR',
 
 # Asym cipher parameters
     'ASYM_CIPHER_PARAM_DIGEST' =>                   '*PKEY_PARAM_DIGEST',
@@ -402,6 +440,8 @@ my %params = (
     'ASYM_CIPHER_PARAM_TLS_CLIENT_VERSION' =>       "tls-client-version",
     'ASYM_CIPHER_PARAM_TLS_NEGOTIATED_VERSION' =>   "tls-negotiated-version",
     'ASYM_CIPHER_PARAM_IMPLICIT_REJECTION' =>       "implicit-rejection",
+    'ASYM_CIPHER_PARAM_FIPS_KEY_CHECK' =>           '*PKEY_PARAM_FIPS_KEY_CHECK',
+    'ASYM_CIPHER_PARAM_FIPS_APPROVED_INDICATOR' =>  '*ALG_PARAM_FIPS_APPROVED_INDICATOR',
 
 # Encoder / decoder parameters
 
@@ -436,6 +476,8 @@ my %params = (
 # KEM parameters
     'KEM_PARAM_OPERATION' =>            "operation",
     'KEM_PARAM_IKME' =>                 "ikme",
+    'KEM_PARAM_FIPS_KEY_CHECK' =>       '*PKEY_PARAM_FIPS_KEY_CHECK',
+    'KEM_PARAM_FIPS_APPROVED_INDICATOR' => '*ALG_PARAM_FIPS_APPROVED_INDICATOR',
 
 # Capabilities
 
@@ -506,6 +548,7 @@ my %params = (
     'LIBSSL_RECORD_LAYER_PARAM_MAX_FRAG_LEN' =>   "max_frag_len",
     'LIBSSL_RECORD_LAYER_PARAM_MAX_EARLY_DATA' => "max_early_data",
     'LIBSSL_RECORD_LAYER_PARAM_BLOCK_PADDING' =>  "block_padding",
+    'LIBSSL_RECORD_LAYER_PARAM_HS_PADDING' =>     "hs_padding",
 );
 
 # Generate string based macros for public consumption
@@ -563,7 +606,7 @@ sub generate_trie {
     my $nodes = 0;
     my $chars = 0;
 
-    foreach my $name (keys %params) {
+    foreach my $name (sort keys %params) {
         my $val = $params{$name};
         if (substr($val, 0, 1) ne '*') {
             my $cursor = \%trie;

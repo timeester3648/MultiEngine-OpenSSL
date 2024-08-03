@@ -1,5 +1,5 @@
 /*
- * Copyright 1995-2023 The OpenSSL Project Authors. All Rights Reserved.
+ * Copyright 1995-2024 The OpenSSL Project Authors. All Rights Reserved.
  *
  * Licensed under the Apache License 2.0 (the "License").  You may not use
  * this file except in compliance with the License.  You can obtain a copy
@@ -159,8 +159,13 @@ void RSA_free(RSA *r)
     CRYPTO_THREAD_lock_free(r->lock);
     CRYPTO_FREE_REF(&r->references);
 
+#ifdef FIPS_MODULE
+    BN_clear_free(r->n);
+    BN_clear_free(r->e);
+#else
     BN_free(r->n);
     BN_free(r->e);
+#endif
     BN_clear_free(r->d);
     BN_clear_free(r->p);
     BN_clear_free(r->q);

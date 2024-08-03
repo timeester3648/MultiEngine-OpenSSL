@@ -47,12 +47,6 @@
 # include <unistd.h>
 #endif
 
-#if defined(__TANDEM)
-# if defined(OPENSSL_TANDEM_FLOSS)
-#  include <floss.h(floss_fork)>
-# endif
-#endif
-
 #if defined(_WIN32)
 # include <windows.h>
 /*
@@ -619,17 +613,37 @@ static int EVP_Digest_loop(const char *mdname, ossl_unused int algindex, void *a
     unsigned char digest[EVP_MAX_MD_SIZE];
     int count;
     EVP_MD *md = NULL;
+    EVP_MD_CTX *ctx = NULL;
 
     if (!opt_md_silent(mdname, &md))
         return -1;
-    for (count = 0; COND(c[algindex][testnum]); count++) {
-        if (!EVP_Digest(buf, (size_t)lengths[testnum], digest, NULL, md,
-                        NULL)) {
+    if (EVP_MD_get_flags(md) & EVP_MD_FLAG_XOF) {
+        ctx = EVP_MD_CTX_new();
+        if (ctx == NULL) {
             count = -1;
-            break;
+            goto out;
+        }
+
+        for (count = 0; COND(c[algindex][testnum]); count++) {
+             if (!EVP_DigestInit_ex2(ctx, md, NULL)
+                 || !EVP_DigestUpdate(ctx, buf, (size_t)lengths[testnum])
+                 || !EVP_DigestFinalXOF(ctx, digest, sizeof(digest))) {
+                count = -1;
+                break;
+            }
+        }
+    } else {
+        for (count = 0; COND(c[algindex][testnum]); count++) {
+            if (!EVP_Digest(buf, (size_t)lengths[testnum], digest, NULL, md,
+                            NULL)) {
+                count = -1;
+                break;
+            }
         }
     }
+out:
     EVP_MD_free(md);
+    EVP_MD_CTX_free(ctx);
     return count;
 }
 
@@ -846,8 +860,12 @@ static int EVP_Update_loop(void *args)
     unsigned char *buf = tempargs->buf;
     EVP_CIPHER_CTX *ctx = tempargs->ctx;
     int outl, count, rc;
+    unsigned char faketag[16] = { 0xcc };
 
     if (decrypt) {
+        if (EVP_CIPHER_get_flags(EVP_CIPHER_CTX_get0_cipher(ctx)) & EVP_CIPH_FLAG_AEAD_CIPHER) {
+            (void)EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_AEAD_SET_TAG, sizeof(faketag), faketag);
+        }
         for (count = 0; COND(c[D_EVP][testnum]); count++) {
             rc = EVP_DecryptUpdate(ctx, buf, &outl, buf, lengths[testnum]);
             if (rc != 1) {
@@ -937,7 +955,7 @@ static int EVP_Update_loop_aead(void *args)
                                     sizeof(faketag), faketag) > 0
                 && EVP_DecryptUpdate(ctx, NULL, &outl, aad, sizeof(aad)) > 0
                 && EVP_DecryptUpdate(ctx, buf, &outl, buf, lengths[testnum]) > 0
-                && EVP_DecryptFinal_ex(ctx, buf + outl, &outl) >0)
+                && EVP_DecryptFinal_ex(ctx, buf + outl, &outl) > 0)
                 realcount++;
         }
     } else {
@@ -3033,7 +3051,7 @@ int speed_main(int argc, char **argv)
             ERR_print_errors(bio_err);
             op_count = 1;
         } else {
-            pkey_print_message("private", "rsa encrypt",
+            pkey_print_message("public", "rsa encrypt",
                                rsa_keys[testnum].bits, seconds.rsa);
             /* RSA_blinding_on(rsa_key[testnum],NULL); */
             Time_F(START);
@@ -3101,7 +3119,6 @@ int speed_main(int argc, char **argv)
             loopargs[i].sigsize = loopargs[i].buflen;
             if (loopargs[i].dsa_sign_ctx[testnum] == NULL
                 || EVP_PKEY_sign_init(loopargs[i].dsa_sign_ctx[testnum]) <= 0
-
                 || EVP_PKEY_sign(loopargs[i].dsa_sign_ctx[testnum],
                                  loopargs[i].buf2,
                                  &loopargs[i].sigsize,
@@ -3178,7 +3195,6 @@ int speed_main(int argc, char **argv)
             loopargs[i].sigsize = loopargs[i].buflen;
             if (loopargs[i].ecdsa_sign_ctx[testnum] == NULL
                 || EVP_PKEY_sign_init(loopargs[i].ecdsa_sign_ctx[testnum]) <= 0
-
                 || EVP_PKEY_sign(loopargs[i].ecdsa_sign_ctx[testnum],
                                  loopargs[i].buf2,
                                  &loopargs[i].sigsize,
@@ -4752,8 +4768,9 @@ static int do_multi(int multi, int size_num)
 static void multiblock_speed(const EVP_CIPHER *evp_cipher, int lengths_single,
                              const openssl_speed_sec_t *seconds)
 {
-    static const int mblengths_list[] =
-        { 8 * 1024, 2 * 8 * 1024, 4 * 8 * 1024, 8 * 8 * 1024, 8 * 16 * 1024 };
+    static const int mblengths_list[] = {
+        8 * 1024, 2 * 8 * 1024, 4 * 8 * 1024, 8 * 8 * 1024, 8 * 16 * 1024
+    };
     const int *mblengths = mblengths_list;
     int j, count, keylen, num = OSSL_NELEM(mblengths_list), ciph_success = 1;
     const char *alg_name;

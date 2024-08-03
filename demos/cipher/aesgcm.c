@@ -64,10 +64,10 @@ static const unsigned char gcm_tag[] = {
  * algorithm implementations. If they are NULL then the default library
  * context and properties are used.
  */
-OSSL_LIB_CTX *libctx = NULL;
-const char *propq = NULL;
+static OSSL_LIB_CTX *libctx = NULL;
+static const char *propq = NULL;
 
-int aes_gcm_encrypt(void)
+static int aes_gcm_encrypt(void)
 {
     int ret = 0;
     EVP_CIPHER_CTX *ctx;
@@ -101,7 +101,7 @@ int aes_gcm_encrypt(void)
      * IV length parameter.
      * For demonstration purposes the IV is being set here. In a compliant
      * application the IV would be generated internally so the iv passed in
-     * would be NULL. 
+     * would be NULL.
      */
     if (!EVP_EncryptInit_ex2(ctx, cipher, gcm_key, gcm_iv, params))
         goto err;
@@ -144,7 +144,7 @@ err:
     return ret;
 }
 
-int aes_gcm_decrypt(void)
+static int aes_gcm_decrypt(void)
 {
     int ret = 0;
     EVP_CIPHER_CTX *ctx;

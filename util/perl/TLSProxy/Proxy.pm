@@ -1,4 +1,4 @@
-# Copyright 2016-2018 The OpenSSL Project Authors. All Rights Reserved.
+# Copyright 2016-2024 The OpenSSL Project Authors. All Rights Reserved.
 #
 # Licensed under the Apache License 2.0 (the "License").  You may not use
 # this file except in compliance with the License.  You can obtain a copy
@@ -25,6 +25,7 @@ use TLSProxy::CertificateRequest;
 use TLSProxy::CertificateVerify;
 use TLSProxy::ServerKeyExchange;
 use TLSProxy::NewSessionTicket;
+use TLSProxy::NextProto;
 
 my $have_IPv6;
 my $IP_factory;
@@ -323,7 +324,7 @@ sub clientstart
 {
     my ($self) = shift;
 
-    my $succes = 1;
+    my $success = 1;
 
     if ($self->execute) {
         my $pid;
@@ -450,7 +451,7 @@ sub clientstart
     if ($ctr >= 10) {
         kill(3, $self->{serverpid});
         print "No progress made\n";
-        $succes = 0;
+        $success = 0;
     }
 
     END:
@@ -482,7 +483,7 @@ sub clientstart
     print "Waiting for s_client process to close: $pid...\n";
     waitpid($pid, 0);
 
-    return $succes;
+    return $success;
 }
 
 sub process_packet

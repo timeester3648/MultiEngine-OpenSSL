@@ -55,7 +55,7 @@ typedef unsigned int u_int;
 #endif
 
 #undef BUFSIZZ
-#define BUFSIZZ 1024*8
+#define BUFSIZZ 1024*16
 #define S_CLIENT_IRC_READ_TIMEOUT 8
 
 #define USER_DATA_MODE_NONE     0
@@ -2167,6 +2167,9 @@ int s_client_main(int argc, char **argv)
     if (tfo)
         BIO_printf(bio_c_out, "Connecting via TFO\n");
  re_start:
+    /* peer_addr might be set from previous connections */
+    BIO_ADDR_free(peer_addr);
+    peer_addr = NULL;
     if (init_client(&sock, host, port, bindhost, bindport, socket_family,
                     socket_type, protocol, tfo, !isquic, &peer_addr) == 0) {
         BIO_printf(bio_err, "connect:errno=%d\n", get_last_socket_error());
@@ -3172,7 +3175,7 @@ int s_client_main(int argc, char **argv)
                 }
             }
 #endif
-            k = SSL_read(con, sbuf, 1024 /* BUFSIZZ */ );
+            k = SSL_read(con, sbuf, BUFSIZZ);
 
             switch (SSL_get_error(con, k)) {
             case SSL_ERROR_NONE:

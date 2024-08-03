@@ -14,13 +14,20 @@ See L<EVP_PKEY-RSA(7)> for information related to RSA keys.
 
 The following signature parameters can be set using EVP_PKEY_CTX_set_params().
 This may be called after EVP_PKEY_sign_init() or EVP_PKEY_verify_init(),
-and before calling EVP_PKEY_sign() or EVP_PKEY_verify().
+and before calling EVP_PKEY_sign() or EVP_PKEY_verify().  They may also be set
+using EVP_PKEY_sign_init_ex() or EVP_PKEY_verify_init_ex().
 
 =over 4
 
 =item "digest" (B<OSSL_SIGNATURE_PARAM_DIGEST>) <UTF8 string>
 
 =item "properties" (B<OSSL_SIGNATURE_PARAM_PROPERTIES>) <UTF8 string>
+
+=item "key-check" (B<OSSL_SIGNATURE_PARAM_FIPS_KEY_CHECK>) <integer>
+
+=item "digest-check" (B<OSSL_SIGNATURE_PARAM_FIPS_DIGEST_CHECK>) <integer>
+
+=item "sign-x931-pad-check" (B<SIGNATURE_PARAM_FIPS_SIGN_X931_PAD_CHECK>) <int>
 
 These common parameters are described in L<provider-signature(7)>.
 
@@ -35,6 +42,10 @@ The type of padding to be used. Its value can be one of the following:
 =item "pkcs1" (B<OSSL_PKEY_RSA_PAD_MODE_PKCSV15>)
 
 =item "x931" (B<OSSL_PKEY_RSA_PAD_MODE_X931>)
+
+This padding mode is no longer supported by the FIPS provider for signature
+generation, but may be used for signature verification for legacy use cases.
+(This is a FIPS 140-3 requirement)
 
 =item "pss" (B<OSSL_PKEY_RSA_PAD_MODE_PSS>)
 
@@ -84,7 +95,9 @@ EVP_PKEY_CTX_get_params().
 
 =item "algorithm-id" (B<OSSL_SIGNATURE_PARAM_ALGORITHM_ID>) <octet string>
 
-This common parameter is described in L<provider-signature(7)>.
+=item "fips-indicator" (B<OSSL_SIGNATURE_PARAM_FIPS_APPROVED_INDICATOR>) <integer>
+
+These common parameter are described in L<provider-signature(7)>.
 
 =item "digest" (B<OSSL_SIGNATURE_PARAM_DIGEST>) <UTF8 string>
 

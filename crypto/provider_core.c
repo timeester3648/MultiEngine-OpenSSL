@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2023 The OpenSSL Project Authors. All Rights Reserved.
+ * Copyright 2019-2024 The OpenSSL Project Authors. All Rights Reserved.
  *
  * Licensed under the Apache License 2.0 (the "License").  You may not use
  * this file except in compliance with the License.  You can obtain a copy
@@ -32,6 +32,7 @@
 #include "crypto/context.h"
 #ifndef FIPS_MODULE
 # include <openssl/self_test.h>
+# include <openssl/indicator.h>
 #endif
 
 /*
@@ -446,13 +447,11 @@ static OSSL_PROVIDER *provider_new(const char *name,
         OPENSSL_free(prov);
         return NULL;
     }
-#ifndef HAVE_ATOMICS
     if ((prov->activatecnt_lock = CRYPTO_THREAD_lock_new()) == NULL) {
         ossl_provider_free(prov);
         ERR_raise(ERR_LIB_CRYPTO, ERR_R_CRYPTO_LIB);
         return NULL;
     }
-#endif
 
     if ((prov->opbits_lock = CRYPTO_THREAD_lock_new()) == NULL
         || (prov->flag_lock = CRYPTO_THREAD_lock_new()) == NULL
@@ -566,8 +565,10 @@ OSSL_PROVIDER *ossl_provider_new(OSSL_LIB_CTX *libctx, const char *name,
             if (params[i].data_type != OSSL_PARAM_UTF8_STRING)
                 continue;
             if (ossl_provider_info_add_parameter(&template, params[i].key,
-                                                 (char *)params[i].data) <= 0)
+                                                 (char *)params[i].data) <= 0) {
+                sk_INFOPAIR_pop_free(template.parameters, infopair_free);
                 return NULL;
+            }
         }
     }
 
@@ -579,6 +580,11 @@ OSSL_PROVIDER *ossl_provider_new(OSSL_LIB_CTX *libctx, const char *name,
 
     if (prov == NULL)
         return NULL;
+
+    if (!ossl_provider_set_module_path(prov, template.path)) {
+        ossl_provider_free(prov);
+        return NULL;
+    }
 
     prov->libctx = libctx;
 #ifndef FIPS_MODULE
@@ -742,9 +748,7 @@ void ossl_provider_free(OSSL_PROVIDER *prov)
             sk_INFOPAIR_pop_free(prov->parameters, infopair_free);
             CRYPTO_THREAD_lock_free(prov->opbits_lock);
             CRYPTO_THREAD_lock_free(prov->flag_lock);
-#ifndef HAVE_ATOMICS
             CRYPTO_THREAD_lock_free(prov->activatecnt_lock);
-#endif
             CRYPTO_FREE_REF(&prov->refcnt);
             OPENSSL_free(prov);
         }
@@ -917,7 +921,7 @@ static int provider_init(OSSL_PROVIDER *prov)
             if (load_dir == NULL) {
                 load_dir = ossl_safe_getenv("OPENSSL_MODULES");
                 if (load_dir == NULL)
-                    load_dir = MODULESDIR;
+                    load_dir = ossl_get_modulesdir();
             }
 
             DSO_ctrl(prov->module, DSO_CTRL_SET_FLAGS,
@@ -1931,6 +1935,7 @@ OSSL_FUNC_BIO_up_ref_fn ossl_core_bio_up_ref;
 OSSL_FUNC_BIO_free_fn ossl_core_bio_free;
 OSSL_FUNC_BIO_vprintf_fn ossl_core_bio_vprintf;
 OSSL_FUNC_BIO_vsnprintf_fn BIO_vsnprintf;
+static OSSL_FUNC_indicator_cb_fn core_indicator_get_callback;
 static OSSL_FUNC_self_test_cb_fn core_self_test_get_callback;
 static OSSL_FUNC_get_entropy_fn rand_get_entropy;
 static OSSL_FUNC_get_user_entropy_fn rand_get_user_entropy;
@@ -2094,6 +2099,12 @@ static int core_pop_error_to_mark(const OSSL_CORE_HANDLE *handle)
     return ERR_pop_to_mark();
 }
 
+static void core_indicator_get_callback(OPENSSL_CORE_CTX *libctx,
+                                        OSSL_INDICATOR_CALLBACK **cb)
+{
+    OSSL_INDICATOR_get_callback((OSSL_LIB_CTX *)libctx, cb);
+}
+
 static void core_self_test_get_callback(OPENSSL_CORE_CTX *libctx,
                                         OSSL_CALLBACK **cb, void **cbarg)
 {
@@ -2255,6 +2266,7 @@ static const OSSL_DISPATCH core_dispatch_[] = {
     { OSSL_FUNC_BIO_VPRINTF, (void (*)(void))ossl_core_bio_vprintf },
     { OSSL_FUNC_BIO_VSNPRINTF, (void (*)(void))BIO_vsnprintf },
     { OSSL_FUNC_SELF_TEST_CB, (void (*)(void))core_self_test_get_callback },
+    { OSSL_FUNC_INDICATOR_CB, (void (*)(void))core_indicator_get_callback },
     { OSSL_FUNC_GET_ENTROPY, (void (*)(void))rand_get_entropy },
     { OSSL_FUNC_GET_USER_ENTROPY, (void (*)(void))rand_get_user_entropy },
     { OSSL_FUNC_CLEANUP_ENTROPY, (void (*)(void))rand_cleanup_entropy },

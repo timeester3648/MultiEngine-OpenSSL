@@ -52,6 +52,8 @@ To install OpenSSL, you will need:
  * Perl 5 with core modules (please read [NOTES-PERL.md](NOTES-PERL.md))
  * The Perl module `Text::Template` (please read [NOTES-PERL.md](NOTES-PERL.md))
  * an ANSI C compiler
+ * POSIX C library (at least POSIX.1-2008), or compatible types and
+   functionality.
  * a development environment in the form of development libraries and C
    header files
  * a supported operating system
@@ -65,6 +67,7 @@ issues and other details, please read one of these:
  * [Notes for the DOS platform with DJGPP](NOTES-DJGPP.md)
  * [Notes for the OpenVMS platform](NOTES-VMS.md)
  * [Notes for the HPE NonStop platform](NOTES-NONSTOP.md)
+ * [Notes on POSIX](NOTES-POSIX.md)
  * [Notes on Perl](NOTES-PERL.md)
  * [Notes on Valgrind](NOTES-VALGRIND.md)
 
@@ -507,11 +510,6 @@ This source is ignored by the FIPS provider.
 Use the `RDSEED` or `RDRAND` command on x86 or `RNDRRS` command on aarch64
 if provided by the CPU.
 
-### librandom
-
-Use librandom (not implemented yet).
-This source is ignored by the FIPS provider.
-
 ### none
 
 Disable automatic seeding.  This is the default on some operating systems where
@@ -523,6 +521,35 @@ at the end of this document.
 
 [rng]: #notes-on-random-number-generation
 
+### jitter
+
+When configured with `enable-jitter`, a "JITTER" RNG is compiled that
+can provide an alternative software seed source. It can be configured
+by setting `seed` option in `openssl.cnf`. A minimal `openssl.cnf` is
+shown below:
+
+    openssl_conf = openssl_init
+
+    [openssl_init]
+    random = random
+
+    [random]
+    seed=JITTER
+
+It uses a statically linked [jitterentropy-library](https://github.com/smuellerDD/jitterentropy-library) as the seed source.
+
+Additional configuration flags available:
+
+    --with-jitter-include=DIR
+
+The directory for the location of the jitterentropy.h include file, if
+it is outside the system include path.
+
+    --with-jitter-lib=DIR
+
+This is the directory containing the static libjitterentropy.a
+library, if it is outside the system library path.
+
 Setting the FIPS HMAC key
 -------------------------
 
@@ -530,7 +557,7 @@ Setting the FIPS HMAC key
 
 As part of its self-test validation, the FIPS module must verify itself
 by performing a SHA-256 HMAC computation on itself. The default key is
-the SHA256 value of "the holy handgrenade of antioch" and is sufficient
+the SHA256 value of "holy hand grenade of antioch" and is sufficient
 for meeting the FIPS requirements.
 
 To change the key to a different value, use this flag. The value should
@@ -870,6 +897,10 @@ As synonym for `no-padlockeng`.  Deprecated and should not be used.
 
 Don't build with support for Position Independent Code.
 
+### enable-pie
+
+Build with support for Position Independent Execution.
+
 ### no-pinshared
 
 Don't pin the shared libraries.
@@ -1112,6 +1143,10 @@ Similarly `no-dtls` will disable `dtls1` and `dtls1_2`.  The `no-ssl` option is
 synonymous with `no-ssl3`.  Note this only affects version negotiation.
 OpenSSL will still provide the methods for applications to explicitly select
 the individual protocol versions.
+
+### no-integrity-only-ciphers
+
+Don't build support for integrity only ciphers in tls.
 
 ### no-{protocol}-method
 

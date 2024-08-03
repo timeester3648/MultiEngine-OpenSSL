@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2023 The OpenSSL Project Authors. All Rights Reserved.
+ * Copyright 2015-2024 The OpenSSL Project Authors. All Rights Reserved.
  *
  * Licensed under the Apache License 2.0 (the "License").  You may not use
  * this file except in compliance with the License.  You can obtain a copy
@@ -2721,6 +2721,47 @@ static int test_emptyikm_HKDF(void)
     return ret;
 }
 
+static int test_empty_salt_info_HKDF(void)
+{
+    EVP_PKEY_CTX *pctx;
+    unsigned char out[20];
+    size_t outlen;
+    int ret = 0;
+    unsigned char salt[] = "";
+    unsigned char key[] = "012345678901234567890123456789";
+    unsigned char info[] = "";
+    const unsigned char expected[] = {
+	0x67, 0x12, 0xf9, 0x27, 0x8a, 0x8a, 0x3a, 0x8f, 0x7d, 0x2c, 0xa3, 0x6a,
+	0xaa, 0xe9, 0xb3, 0xb9, 0x52, 0x5f, 0xe0, 0x06,
+    };
+    size_t expectedlen = sizeof(expected);
+
+    if (!TEST_ptr(pctx = EVP_PKEY_CTX_new_from_name(testctx, "HKDF", testpropq)))
+        goto done;
+
+    outlen = sizeof(out);
+    memset(out, 0, outlen);
+
+    if (!TEST_int_gt(EVP_PKEY_derive_init(pctx), 0)
+            || !TEST_int_gt(EVP_PKEY_CTX_set_hkdf_md(pctx, EVP_sha256()), 0)
+            || !TEST_int_gt(EVP_PKEY_CTX_set1_hkdf_salt(pctx, salt,
+                                                        sizeof(salt) - 1), 0)
+            || !TEST_int_gt(EVP_PKEY_CTX_set1_hkdf_key(pctx, key,
+                                                       sizeof(key) - 1), 0)
+            || !TEST_int_gt(EVP_PKEY_CTX_add1_hkdf_info(pctx, info,
+                                                        sizeof(info) - 1), 0)
+            || !TEST_int_gt(EVP_PKEY_derive(pctx, out, &outlen), 0)
+            || !TEST_mem_eq(out, outlen, expected, expectedlen))
+        goto done;
+
+    ret = 1;
+
+ done:
+    EVP_PKEY_CTX_free(pctx);
+
+    return ret;
+}
+
 #ifndef OPENSSL_NO_EC
 static int test_X509_PUBKEY_inplace(void)
 {
@@ -3463,28 +3504,43 @@ static int test_evp_iv_aes(int idx)
 {
     int ret = 0;
     EVP_CIPHER_CTX *ctx = NULL;
-    unsigned char key[16] = {0x4c, 0x43, 0xdb, 0xdd, 0x42, 0x73, 0x47, 0xd1,
-                             0xe5, 0x62, 0x7d, 0xcd, 0x4d, 0x76, 0x4d, 0x57};
-    unsigned char init_iv[EVP_MAX_IV_LENGTH] =
-        {0x57, 0x71, 0x7d, 0xad, 0xdb, 0x9b, 0x98, 0x82,
-         0x5a, 0x55, 0x91, 0x81, 0x42, 0xa8, 0x89, 0x34};
-    static const unsigned char msg[] = { 1, 2, 3, 4, 5, 6, 7, 8,
-                                         9, 10, 11, 12, 13, 14, 15, 16 };
+    unsigned char key[16] = {
+        0x4c, 0x43, 0xdb, 0xdd, 0x42, 0x73, 0x47, 0xd1,
+        0xe5, 0x62, 0x7d, 0xcd, 0x4d, 0x76, 0x4d, 0x57
+    };
+    unsigned char init_iv[EVP_MAX_IV_LENGTH] = {
+        0x57, 0x71, 0x7d, 0xad, 0xdb, 0x9b, 0x98, 0x82,
+        0x5a, 0x55, 0x91, 0x81, 0x42, 0xa8, 0x89, 0x34
+    };
+    static const unsigned char msg[] = {
+        1, 2, 3, 4, 5, 6, 7, 8,
+        9, 10, 11, 12, 13, 14, 15, 16
+    };
     unsigned char ciphertext[32], oiv[16], iv[16];
     unsigned char *ref_iv;
-    unsigned char cbc_state[16] = {0x10, 0x2f, 0x05, 0xcc, 0xc2, 0x55, 0x72, 0xb9,
-                                   0x88, 0xe6, 0x4a, 0x17, 0x10, 0x74, 0x22, 0x5e};
+    unsigned char cbc_state[16] = {
+        0x10, 0x2f, 0x05, 0xcc, 0xc2, 0x55, 0x72, 0xb9,
+        0x88, 0xe6, 0x4a, 0x17, 0x10, 0x74, 0x22, 0x5e
+    };
 
-    unsigned char ofb_state[16] = {0x76, 0xe6, 0x66, 0x61, 0xd0, 0x8a, 0xe4, 0x64,
-                                   0xdd, 0x66, 0xbf, 0x00, 0xf0, 0xe3, 0x6f, 0xfd};
-    unsigned char cfb_state[16] = {0x77, 0xe4, 0x65, 0x65, 0xd5, 0x8c, 0xe3, 0x6c,
-                                   0xd4, 0x6c, 0xb4, 0x0c, 0xfd, 0xed, 0x60, 0xed};
-    unsigned char gcm_state[12] = {0x57, 0x71, 0x7d, 0xad, 0xdb, 0x9b,
-                                   0x98, 0x82, 0x5a, 0x55, 0x91, 0x81};
-    unsigned char ccm_state[7] = {0x57, 0x71, 0x7d, 0xad, 0xdb, 0x9b, 0x98};
+    unsigned char ofb_state[16] = {
+        0x76, 0xe6, 0x66, 0x61, 0xd0, 0x8a, 0xe4, 0x64,
+        0xdd, 0x66, 0xbf, 0x00, 0xf0, 0xe3, 0x6f, 0xfd
+    };
+    unsigned char cfb_state[16] = {
+        0x77, 0xe4, 0x65, 0x65, 0xd5, 0x8c, 0xe3, 0x6c,
+        0xd4, 0x6c, 0xb4, 0x0c, 0xfd, 0xed, 0x60, 0xed
+    };
+    unsigned char gcm_state[12] = {
+        0x57, 0x71, 0x7d, 0xad, 0xdb, 0x9b,
+        0x98, 0x82, 0x5a, 0x55, 0x91, 0x81
+    };
+    unsigned char ccm_state[7] = { 0x57, 0x71, 0x7d, 0xad, 0xdb, 0x9b, 0x98 };
 #ifndef OPENSSL_NO_OCB
-    unsigned char ocb_state[12] = {0x57, 0x71, 0x7d, 0xad, 0xdb, 0x9b,
-                                   0x98, 0x82, 0x5a, 0x55, 0x91, 0x81};
+    unsigned char ocb_state[12] = {
+        0x57, 0x71, 0x7d, 0xad, 0xdb, 0x9b,
+        0x98, 0x82, 0x5a, 0x55, 0x91, 0x81
+    };
 #endif
     int len = sizeof(ciphertext);
     size_t ivlen, ref_len;
@@ -3613,8 +3669,10 @@ static int test_evp_iv_des(int idx)
     static const unsigned char init_iv[8] = {
         0xfe, 0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10
     };
-    static const unsigned char msg[] = { 1, 2, 3, 4, 5, 6, 7, 8,
-                                         9, 10, 11, 12, 13, 14, 15, 16 };
+    static const unsigned char msg[] = {
+        1, 2, 3, 4, 5, 6, 7, 8,
+        9, 10, 11, 12, 13, 14, 15, 16
+    };
     unsigned char ciphertext[32], oiv[8], iv[8];
     unsigned const char *ref_iv;
     static const unsigned char cbc_state_des[8] = {
@@ -5583,6 +5641,25 @@ static int test_aes_rc4_keylen_change_cve_2023_5363(void)
 }
 #endif
 
+static int test_invalid_ctx_for_digest(void)
+{
+    int ret;
+    EVP_MD_CTX *mdctx;
+
+    mdctx = EVP_MD_CTX_new();
+    if (!TEST_ptr(mdctx))
+        return 0;
+
+    if (!TEST_int_eq(EVP_DigestUpdate(mdctx, "test", sizeof("test") - 1), 0))
+        ret = 0;
+    else
+        ret = 1;
+
+    EVP_MD_CTX_free(mdctx);
+
+    return ret;
+}
+
 int setup_tests(void)
 {
     OPTION_CHOICE o;
@@ -5660,6 +5737,7 @@ int setup_tests(void)
 #endif
     ADD_TEST(test_HKDF);
     ADD_TEST(test_emptyikm_HKDF);
+    ADD_TEST(test_empty_salt_info_HKDF);
 #ifndef OPENSSL_NO_EC
     ADD_TEST(test_X509_PUBKEY_inplace);
     ADD_TEST(test_X509_PUBKEY_dup);
@@ -5752,6 +5830,8 @@ int setup_tests(void)
 #ifndef OPENSSL_NO_RC4
     ADD_TEST(test_aes_rc4_keylen_change_cve_2023_5363);
 #endif
+
+    ADD_TEST(test_invalid_ctx_for_digest);
 
     return 1;
 }

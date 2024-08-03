@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 The OpenSSL Project Authors. All Rights Reserved.
+ * Copyright 2016-2024 The OpenSSL Project Authors. All Rights Reserved.
  *
  * Licensed under the Apache License 2.0 (the "License").  You may not use
  * this file except in compliance with the License.  You can obtain a copy
@@ -23,7 +23,8 @@ struct rcu_lock_st {
     struct rcu_cb_item *cb_items;
 };
 
-CRYPTO_RCU_LOCK *ossl_rcu_lock_new(int num_writers)
+CRYPTO_RCU_LOCK *ossl_rcu_lock_new(int num_writers,
+                                   ossl_unused OSSL_LIB_CTX *ctx)
 {
     struct rcu_lock_st *lock;
 
@@ -210,6 +211,24 @@ int CRYPTO_atomic_add(int *val, int amount, int *ret, CRYPTO_RWLOCK *lock)
     return 1;
 }
 
+int CRYPTO_atomic_add64(uint64_t *val, uint64_t op, uint64_t *ret,
+                        CRYPTO_RWLOCK *lock)
+{
+    *val += op;
+    *ret  = *val;
+
+    return 1;
+}
+
+int CRYPTO_atomic_and(uint64_t *val, uint64_t op, uint64_t *ret,
+                      CRYPTO_RWLOCK *lock)
+{
+    *val &= op;
+    *ret  = *val;
+
+    return 1;
+}
+
 int CRYPTO_atomic_or(uint64_t *val, uint64_t op, uint64_t *ret,
                      CRYPTO_RWLOCK *lock)
 {
@@ -222,6 +241,13 @@ int CRYPTO_atomic_or(uint64_t *val, uint64_t op, uint64_t *ret,
 int CRYPTO_atomic_load(uint64_t *val, uint64_t *ret, CRYPTO_RWLOCK *lock)
 {
     *ret  = *val;
+
+    return 1;
+}
+
+int CRYPTO_atomic_store(uint64_t *dst, uint64_t val, CRYPTO_RWLOCK *lock)
+{
+    *dst = val;
 
     return 1;
 }

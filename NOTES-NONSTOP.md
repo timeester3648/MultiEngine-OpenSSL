@@ -19,9 +19,7 @@ About c99 compiler
 
 The c99 compiler is required for building OpenSSL from source. While c11
 may work, it has not been broadly tested. c99 is the only compiler
-prerequisite needed to build OpenSSL 3.0 on this platform. You should also
-have the FLOSS package installed on your system. The ITUGLIB FLOSS package
-is the only FLOSS variant that has been broadly tested.
+prerequisite needed to build OpenSSL 3.0 on this platform.
 
 Threading Models
 ----------------
@@ -36,6 +34,9 @@ for each on the TNS/X (L-Series) platform:
  * `nonstop-nsx_64_put` selects the 64-bit memory and file length PUT build.
 
 The SPT threading model is no longer supported as of OpenSSL 3.2.
+
+The PUT model is incompatible with the QUIC capability. This capability should
+be disabled when building with PUT.
 
 ### TNS/E Considerations
 
@@ -216,13 +217,10 @@ Example Configure Targets
 -------------------------
 
 For OSS targets, the main DLL names will be `libssl.so` and `libcrypto.so`.
-For GUARDIAN targets, DLL names will be `ssl` and `crypto`. The following
-assumes that your PWD is set according to your installation standards.
+The following assumes that your PWD is set according to your installation
+standards.
 
     ./Configure nonstop-nsx           --prefix=${PWD} \
-        --openssldir=${PWD}/ssl no-threads \
-        --with-rand-seed=rdcpu ${CIPHENABLES} ${DBGFLAG} ${SYSTEMLIBS}
-    ./Configure nonstop-nsx_g         --prefix=${PWD} \
         --openssldir=${PWD}/ssl no-threads \
         --with-rand-seed=rdcpu ${CIPHENABLES} ${DBGFLAG} ${SYSTEMLIBS}
     ./Configure nonstop-nsx_put       --prefix=${PWD} \
@@ -233,9 +231,6 @@ assumes that your PWD is set according to your installation standards.
         --with-rand-seed=rdcpu ${CIPHENABLES} ${DBGFLAG} ${SYSTEMLIBS}
     ./Configure nonstop-nsx_64_put    --prefix=${PWD} \
         --openssldir=${PWD}/ssl threads "-D_REENTRANT" \
-        --with-rand-seed=rdcpu ${CIPHENABLES} ${DBGFLAG} ${SYSTEMLIBS}
-    ./Configure nonstop-nsx_g_tandem  --prefix=${PWD} \
-        --openssldir=${PWD}/ssl no-threads \
         --with-rand-seed=rdcpu ${CIPHENABLES} ${DBGFLAG} ${SYSTEMLIBS}
 
     ./Configure nonstop-nse           --prefix=${PWD} \
@@ -252,7 +247,4 @@ assumes that your PWD is set according to your installation standards.
         --with-rand-seed=egd ${CIPHENABLES} ${DBGFLAG} ${SYSTEMLIBS}
     ./Configure nonstop-nse_64_put    --prefix=${PWD} \
         --openssldir=${PWD}/ssl threads "-D_REENTRANT"
-        --with-rand-seed=egd ${CIPHENABLES} ${DBGFLAG} ${SYSTEMLIBS}
-    ./Configure nonstop-nse_g_tandem  --prefix=${PWD} \
-        --openssldir=${PWD}/ssl no-threads \
         --with-rand-seed=egd ${CIPHENABLES} ${DBGFLAG} ${SYSTEMLIBS}

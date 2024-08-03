@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 The OpenSSL Project Authors. All Rights Reserved.
+ * Copyright 2023-2024 The OpenSSL Project Authors. All Rights Reserved.
  *
  * Licensed under the Apache License 2.0 (the "License").  You may not use
  * this file except in compliance with the License.  You can obtain a copy
@@ -784,7 +784,7 @@ static int helper_init(struct helper *h, const char *script_name,
         goto err;
 
     /* Set title for qlog purposes. */
-    snprintf(title, sizeof(title), "quic_multistream_test: %s", script_name);
+    BIO_snprintf(title, sizeof(title), "quic_multistream_test: %s", script_name);
     if (!TEST_true(ossl_quic_set_diag_title(h->c_ctx, title)))
         goto err;
 
@@ -2376,6 +2376,7 @@ static const struct script_op script_10[] = {
 static const struct script_op script_11_child[] = {
     OP_C_ACCEPT_STREAM_WAIT (a)
     OP_C_READ_EXPECT        (a, "foo", 3)
+    OP_SLEEP                (10)
     OP_C_EXPECT_FIN         (a)
 
     OP_END
@@ -2854,7 +2855,7 @@ static const struct script_op script_21[] = {
 
     OP_S_WRITE              (a, "orange", 6)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_FRAME_ENCODING_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_FRAME_ENCODING_ERROR,0,0)
 
     OP_END
 };
@@ -2883,7 +2884,7 @@ static const struct script_op script_22[] = {
 
     OP_S_WRITE              (a, "orange", 6)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_PROTOCOL_VIOLATION,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_PROTOCOL_VIOLATION,0,0)
 
     OP_END
 };
@@ -2936,7 +2937,7 @@ static const struct script_op script_23[] = {
 
     OP_S_WRITE              (a, "orange", 6)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_FRAME_ENCODING_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_FRAME_ENCODING_ERROR,0,0)
 
     OP_END
 };
@@ -2989,7 +2990,7 @@ static const struct script_op script_24[] = {
 
     OP_S_WRITE              (a, "orange", 6)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_FRAME_ENCODING_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_FRAME_ENCODING_ERROR,0,0)
 
     OP_END
 };
@@ -3008,7 +3009,7 @@ static const struct script_op script_25[] = {
 
     OP_S_WRITE              (a, "orange", 6)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_FRAME_ENCODING_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_FRAME_ENCODING_ERROR,0,0)
 
     OP_END
 };
@@ -3027,7 +3028,7 @@ static const struct script_op script_26[] = {
 
     OP_S_WRITE              (a, "orange", 6)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_STREAM_LIMIT_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_STREAM_LIMIT_ERROR,0,0)
 
     OP_END
 };
@@ -3046,7 +3047,7 @@ static const struct script_op script_27[] = {
 
     OP_S_WRITE              (a, "orange", 6)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_STREAM_LIMIT_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_STREAM_LIMIT_ERROR,0,0)
 
     OP_END
 };
@@ -3111,7 +3112,7 @@ static const struct script_op script_28[] = {
     OP_SET_INJECT_WORD      (C_UNI_ID(0) + 1, OSSL_QUIC_FRAME_TYPE_RESET_STREAM)
     OP_S_WRITE              (a, "fruit", 5)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_STREAM_STATE_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_STREAM_STATE_ERROR,0,0)
 
     OP_END
 };
@@ -3138,7 +3139,7 @@ static const struct script_op script_29[] = {
     OP_SET_INJECT_WORD      (C_UNI_ID(1) + 1, OSSL_QUIC_FRAME_TYPE_RESET_STREAM)
     OP_S_WRITE              (a, "fruit", 5)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_STREAM_STATE_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_STREAM_STATE_ERROR,0,0)
 
     OP_END
 };
@@ -3159,7 +3160,7 @@ static const struct script_op script_30[] = {
     OP_SET_INJECT_WORD      (S_UNI_ID(0) + 1, OSSL_QUIC_FRAME_TYPE_STOP_SENDING)
     OP_S_WRITE              (a, "orange", 6)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_STREAM_STATE_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_STREAM_STATE_ERROR,0,0)
 
     OP_END
 };
@@ -3180,7 +3181,7 @@ static const struct script_op script_31[] = {
     OP_SET_INJECT_WORD      (C_UNI_ID(0) + 1, OSSL_QUIC_FRAME_TYPE_STOP_SENDING)
     OP_S_WRITE              (a, "orange", 6)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_STREAM_STATE_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_STREAM_STATE_ERROR,0,0)
 
     OP_END
 };
@@ -3266,7 +3267,7 @@ static const struct script_op script_32[] = {
     OP_SET_INJECT_WORD      (C_UNI_ID(0) + 1, 1)
     OP_S_WRITE              (a, "orange", 6)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_STREAM_STATE_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_STREAM_STATE_ERROR,0,0)
 
     OP_END
 };
@@ -3287,7 +3288,7 @@ static const struct script_op script_33[] = {
     OP_SET_INJECT_WORD      (C_BIDI_ID(0) + 1, 2)
     OP_S_WRITE              (a, "orange", 6)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_FRAME_ENCODING_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_FRAME_ENCODING_ERROR,0,0)
 
     OP_END
 };
@@ -3308,7 +3309,7 @@ static const struct script_op script_34[] = {
     OP_SET_INJECT_WORD      (C_BIDI_ID(0) + 1, 3)
     OP_S_WRITE              (a, "orange", 6)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_FLOW_CONTROL_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_FLOW_CONTROL_ERROR,0,0)
 
     OP_END
 };
@@ -3329,7 +3330,7 @@ static const struct script_op script_35[] = {
     OP_SET_INJECT_WORD      (S_UNI_ID(0) + 1, OSSL_QUIC_FRAME_TYPE_MAX_STREAM_DATA)
     OP_S_WRITE              (a, "orange", 6)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_STREAM_STATE_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_STREAM_STATE_ERROR,0,0)
 
     OP_END
 };
@@ -3350,7 +3351,7 @@ static const struct script_op script_36[] = {
     OP_SET_INJECT_WORD      (C_BIDI_ID(0) + 1, OSSL_QUIC_FRAME_TYPE_MAX_STREAM_DATA)
     OP_S_WRITE              (a, "orange", 6)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_STREAM_STATE_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_STREAM_STATE_ERROR,0,0)
 
     OP_END
 };
@@ -3372,7 +3373,7 @@ static const struct script_op script_37[] = {
     OP_SET_INJECT_WORD      (C_UNI_ID(0) + 1, OSSL_QUIC_FRAME_TYPE_STREAM_DATA_BLOCKED)
     OP_S_WRITE              (b, "orange", 5)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_STREAM_STATE_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_STREAM_STATE_ERROR,0,0)
 
     OP_END
 };
@@ -3395,7 +3396,7 @@ static const struct script_op script_38[] = {
     OP_S_NEW_STREAM_UNI     (b, S_UNI_ID(0))
     OP_S_WRITE              (b, "orange", 5)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_STREAM_STATE_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_STREAM_STATE_ERROR,0,0)
 
     OP_END
 };
@@ -3502,7 +3503,7 @@ static const struct script_op script_39[] = {
     OP_SET_INJECT_WORD      (0, 1)
     OP_S_WRITE              (a, "orange", 5)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_FRAME_ENCODING_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_FRAME_ENCODING_ERROR,0,0)
 
     OP_END
 };
@@ -3717,7 +3718,7 @@ static const struct script_op script_42[] = {
     OP_SET_INJECT_WORD      (1, (((uint64_t)1) << 62) - 1)
     OP_S_WRITE              (a, "orange", 6)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_FRAME_ENCODING_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_FRAME_ENCODING_ERROR,0,0)
 
     OP_END
 };
@@ -3738,7 +3739,7 @@ static const struct script_op script_43[] = {
     OP_SET_INJECT_WORD      (1, 0x100000 /* 1 MiB */)
     OP_S_WRITE              (a, "orange", 6)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_CRYPTO_BUFFER_EXCEEDED,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_CRYPTO_BUFFER_EXCEEDED,0,0)
 
     OP_END
 };
@@ -3950,7 +3951,7 @@ static const struct script_op script_46[] = {
 
     OP_S_WRITE              (a, "Strawberry", 10)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_FRAME_ENCODING_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_FRAME_ENCODING_ERROR,0,0)
 
     OP_END
 };
@@ -3969,7 +3970,7 @@ static const struct script_op script_47[] = {
 
     OP_S_WRITE              (a, "Strawberry", 10)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_FRAME_ENCODING_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_FRAME_ENCODING_ERROR,0,0)
 
     OP_END
 };
@@ -3988,7 +3989,7 @@ static const struct script_op script_48[] = {
 
     OP_S_WRITE              (a, "Strawberry", 10)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_FRAME_ENCODING_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_FRAME_ENCODING_ERROR,0,0)
 
     OP_END
 };
@@ -4215,7 +4216,7 @@ static const struct script_op script_53[] = {
     OP_SET_INJECT_WORD      (1, 0)
     OP_S_WRITE              (a, "Strawberry", 10)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_CRYPTO_BUFFER_EXCEEDED,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_CRYPTO_BUFFER_EXCEEDED,0,0)
 
     OP_END
 };
@@ -4237,7 +4238,7 @@ static const struct script_op script_54[] = {
     OP_C_SET_ALPN           ("ossltest")
     OP_C_CONNECT_WAIT_OR_FAIL()
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_CRYPTO_UNEXPECTED_MESSAGE,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_CRYPTO_UNEXPECTED_MESSAGE,0,0)
 
     OP_END
 };
@@ -4257,7 +4258,7 @@ static const struct script_op script_55[] = {
     OP_SET_INJECT_WORD      (0, 2)
     OP_S_WRITE              (a, "orange", 5)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_FRAME_ENCODING_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_FRAME_ENCODING_ERROR,0,0)
 
     OP_END
 };
@@ -4277,7 +4278,7 @@ static const struct script_op script_56[] = {
     OP_SET_INJECT_WORD      (0, 3)
     OP_S_WRITE              (a, "orange", 5)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_FRAME_ENCODING_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_FRAME_ENCODING_ERROR,0,0)
 
     OP_END
 };
@@ -4391,7 +4392,7 @@ static const struct script_op script_59[] = {
 
     OP_S_WRITE              (a, "orange", 6)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_PROTOCOL_VIOLATION,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_PROTOCOL_VIOLATION,0,0)
 
     OP_END
 };
@@ -4494,7 +4495,7 @@ static const struct script_op script_61[] = {
                              S_BIDI_ID(OSSL_QUIC_VLINT_MAX / 4))
     OP_S_WRITE              (a, "fruit", 5)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_STREAM_LIMIT_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_STREAM_LIMIT_ERROR,0,0)
 
     OP_END
 };
@@ -4516,7 +4517,7 @@ static const struct script_op script_62[] = {
                              C_BIDI_ID(OSSL_QUIC_VLINT_MAX / 4))
     OP_S_WRITE              (a, "fruit", 5)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_STREAM_STATE_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_STREAM_STATE_ERROR,0,0)
 
     OP_END
 };
@@ -4537,7 +4538,7 @@ static const struct script_op script_63[] = {
     OP_SET_INJECT_WORD      (S_BIDI_ID(5000) + 1, 4)
     OP_S_WRITE              (a, "orange", 6)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_STREAM_LIMIT_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_STREAM_LIMIT_ERROR,0,0)
 
     OP_END
 };
@@ -4772,7 +4773,7 @@ static const struct script_op script_68[] = {
     OP_S_NEW_TICKET          ()
     OP_S_WRITE               (a, "orange", 6)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_PROTOCOL_VIOLATION, 0, 0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_PROTOCOL_VIOLATION, 0, 0)
 
     OP_END
 };
@@ -4793,7 +4794,7 @@ static const struct script_op script_69[] = {
     OP_S_NEW_TICKET          ()
     OP_S_WRITE               (a, "orange", 6)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_CRYPTO_ERR_BEGIN
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_CRYPTO_ERR_BEGIN
                                 + SSL_AD_UNEXPECTED_MESSAGE, 0, 0)
 
     OP_END
@@ -4824,7 +4825,7 @@ static const struct script_op script_70[] = {
     OP_S_NEW_TICKET          ()
     OP_S_WRITE               (a, "orange", 6)
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_PROTOCOL_VIOLATION, 0, 0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_PROTOCOL_VIOLATION, 0, 0)
 
     OP_END
 };
@@ -4996,7 +4997,7 @@ static const struct script_op script_75[] = {
     OP_C_SET_ALPN            ("ossltest")
     OP_C_CONNECT_WAIT_OR_FAIL()
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_CONNECTION_REFUSED,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_CONNECTION_REFUSED,0,0)
 
     OP_END
 };
@@ -5389,6 +5390,31 @@ static int check_avail_streams(struct helper *h, struct helper_local *hl)
     return 1;
 }
 
+static int set_event_handling_mode_conn(struct helper *h, struct helper_local *hl);
+static int reenable_test_event_handling(struct helper *h, struct helper_local *hl);
+
+static int check_write_buf_stat(struct helper *h, struct helper_local *hl)
+{
+    SSL *c_a;
+    uint64_t size, used, avail;
+
+    if (!TEST_ptr(c_a = helper_local_get_c_stream(hl, "a")))
+        return 0;
+
+    if (!TEST_true(SSL_get_stream_write_buf_size(c_a, &size))
+        || !TEST_true(SSL_get_stream_write_buf_used(c_a, &used))
+        || !TEST_true(SSL_get_stream_write_buf_avail(c_a, &avail))
+        || !TEST_uint64_t_ge(size, avail)
+        || !TEST_uint64_t_ge(size, used)
+        || !TEST_uint64_t_eq(avail + used, size))
+        return 0;
+
+    if (!TEST_uint64_t_eq(used, hl->check_op->arg1))
+        return 0;
+
+    return 1;
+}
+
 static const struct script_op script_84[] = {
     OP_C_SET_ALPN           ("ossltest")
     OP_C_CONNECT_WAIT       ()
@@ -5435,6 +5461,20 @@ static const struct script_op script_84[] = {
     OP_CHECK2               (check_avail_streams, 1, 99)
     OP_CHECK2               (check_avail_streams, 2, 99)
     OP_CHECK2               (check_avail_streams, 3, 99)
+
+    OP_CHECK2               (check_write_buf_stat, 0, 0)
+    OP_CHECK                (set_event_handling_mode_conn,
+                             SSL_VALUE_EVENT_HANDLING_MODE_EXPLICIT)
+    OP_C_WRITE              (a, "apple", 5)
+    OP_CHECK2               (check_write_buf_stat, 5, 0)
+
+    OP_CHECK                (reenable_test_event_handling, 0)
+
+    OP_S_BIND_STREAM_ID     (a, C_BIDI_ID(0))
+    OP_S_READ_EXPECT        (a, "apple", 5)
+    OP_S_WRITE              (a, "orange", 6)
+    OP_C_READ_EXPECT        (a, "orange", 6)
+    OP_CHECK2               (check_write_buf_stat, 0, 0)
 
     OP_END
 };
@@ -5788,7 +5828,7 @@ static int test_script(int idx)
     }
 #endif
 
-    snprintf(script_name, sizeof(script_name), "script %d", script_idx + 1);
+    BIO_snprintf(script_name, sizeof(script_name), "script %d", script_idx + 1);
 
     TEST_info("Running script %d (order=%d, blocking=%d)", script_idx + 1,
               free_order, blocking);
@@ -5803,7 +5843,7 @@ static struct script_op dyn_frame_types_script[] = {
     OP_C_SET_ALPN           ("ossltest")
     OP_C_CONNECT_WAIT_OR_FAIL()
 
-    OP_C_EXPECT_CONN_CLOSE_INFO(QUIC_ERR_FRAME_ENCODING_ERROR,0,0)
+    OP_C_EXPECT_CONN_CLOSE_INFO(OSSL_QUIC_ERR_FRAME_ENCODING_ERROR,0,0)
 
     OP_END
 };
@@ -5813,50 +5853,50 @@ struct forbidden_frame_type {
 };
 
 static const struct forbidden_frame_type forbidden_frame_types[] = {
-    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_VLINT_MAX, QUIC_ERR_FRAME_ENCODING_ERROR },
-    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_VLINT_MAX, QUIC_ERR_FRAME_ENCODING_ERROR },
-    { QUIC_PKT_TYPE_1RTT, OSSL_QUIC_VLINT_MAX, QUIC_ERR_FRAME_ENCODING_ERROR },
+    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_VLINT_MAX, OSSL_QUIC_ERR_FRAME_ENCODING_ERROR },
+    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_VLINT_MAX, OSSL_QUIC_ERR_FRAME_ENCODING_ERROR },
+    { QUIC_PKT_TYPE_1RTT, OSSL_QUIC_VLINT_MAX, OSSL_QUIC_ERR_FRAME_ENCODING_ERROR },
 
-    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_STREAM, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_RESET_STREAM, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_STOP_SENDING, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_NEW_TOKEN, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_MAX_DATA, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_MAX_STREAM_DATA, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_MAX_STREAMS_BIDI, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_MAX_STREAMS_UNI, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_DATA_BLOCKED, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_STREAM_DATA_BLOCKED, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_STREAMS_BLOCKED_BIDI, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_STREAMS_BLOCKED_UNI, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_NEW_CONN_ID, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_RETIRE_CONN_ID, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_PATH_CHALLENGE, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_PATH_RESPONSE, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_CONN_CLOSE_APP, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_HANDSHAKE_DONE, QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_STREAM, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_RESET_STREAM, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_STOP_SENDING, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_NEW_TOKEN, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_MAX_DATA, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_MAX_STREAM_DATA, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_MAX_STREAMS_BIDI, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_MAX_STREAMS_UNI, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_DATA_BLOCKED, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_STREAM_DATA_BLOCKED, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_STREAMS_BLOCKED_BIDI, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_STREAMS_BLOCKED_UNI, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_NEW_CONN_ID, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_RETIRE_CONN_ID, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_PATH_CHALLENGE, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_PATH_RESPONSE, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_CONN_CLOSE_APP, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_INITIAL, OSSL_QUIC_FRAME_TYPE_HANDSHAKE_DONE, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
 
-    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_STREAM, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_RESET_STREAM, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_STOP_SENDING, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_NEW_TOKEN, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_MAX_DATA, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_MAX_STREAM_DATA, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_MAX_STREAMS_BIDI, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_MAX_STREAMS_UNI, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_DATA_BLOCKED, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_STREAM_DATA_BLOCKED, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_STREAMS_BLOCKED_BIDI, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_STREAMS_BLOCKED_UNI, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_NEW_CONN_ID, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_RETIRE_CONN_ID, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_PATH_CHALLENGE, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_PATH_RESPONSE, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_CONN_CLOSE_APP, QUIC_ERR_PROTOCOL_VIOLATION },
-    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_HANDSHAKE_DONE, QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_STREAM, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_RESET_STREAM, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_STOP_SENDING, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_NEW_TOKEN, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_MAX_DATA, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_MAX_STREAM_DATA, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_MAX_STREAMS_BIDI, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_MAX_STREAMS_UNI, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_DATA_BLOCKED, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_STREAM_DATA_BLOCKED, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_STREAMS_BLOCKED_BIDI, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_STREAMS_BLOCKED_UNI, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_NEW_CONN_ID, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_RETIRE_CONN_ID, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_PATH_CHALLENGE, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_PATH_RESPONSE, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_CONN_CLOSE_APP, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_HANDSHAKE, OSSL_QUIC_FRAME_TYPE_HANDSHAKE_DONE, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
 
     /* Client uses a zero-length CID so this is not allowed. */
-    { QUIC_PKT_TYPE_1RTT, OSSL_QUIC_FRAME_TYPE_RETIRE_CONN_ID, QUIC_ERR_PROTOCOL_VIOLATION },
+    { QUIC_PKT_TYPE_1RTT, OSSL_QUIC_FRAME_TYPE_RETIRE_CONN_ID, OSSL_QUIC_ERR_PROTOCOL_VIOLATION },
 };
 
 static ossl_unused int test_dyn_frame_types(int idx)
@@ -5873,8 +5913,8 @@ static ossl_unused int test_dyn_frame_types(int idx)
             s[i].arg2 = forbidden_frame_types[idx].expected_err;
         }
 
-    snprintf(script_name, sizeof(script_name),
-             "dyn script %d", idx);
+    BIO_snprintf(script_name, sizeof(script_name),
+                 "dyn script %d", idx);
 
     return run_script(dyn_frame_types_script, script_name, 0, 0);
 }
@@ -5883,6 +5923,10 @@ OPT_TEST_DECLARE_USAGE("certfile privkeyfile\n")
 
 int setup_tests(void)
 {
+#if defined (_PUT_MODEL_)
+    return TEST_skip("QUIC is not supported by this build");
+#endif
+
     if (!test_skip_common_options()) {
         TEST_error("Error parsing test options\n");
         return 0;

@@ -36,7 +36,7 @@ OSSL_CMP_MSG_get0_header() returns the header of the given CMP message.
 OSSL_CMP_MSG_get_bodytype() returns the body type of the given CMP message.
 
 OSSL_CMP_MSG_get0_certreq_publickey() expects that I<msg> is a certificate request
-messsage and returns the public key in its certificate template if present.
+message and returns the public key in its certificate template if present.
 
 OSSL_CMP_MSG_update_transactionID() updates the transactionID field
 in the header of the given message according to the CMP_CTX.
@@ -157,7 +157,7 @@ OSSL_CMP_MSG_get0_certreq_publickey() was added in OpenSSL 3.3.
 
 =head1 COPYRIGHT
 
-Copyright 2007-2023 The OpenSSL Project Authors. All Rights Reserved.
+Copyright 2007-2024 The OpenSSL Project Authors. All Rights Reserved.
 
 Licensed under the Apache License 2.0 (the "License").  You may not use
 this file except in compliance with the License.  You can obtain a copy

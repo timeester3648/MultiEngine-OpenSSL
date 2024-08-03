@@ -234,9 +234,13 @@ CMP_R_FAILED_BUILDING_OWN_CHAIN:164:failed building own chain
 CMP_R_FAILED_EXTRACTING_PUBKEY:141:failed extracting pubkey
 CMP_R_FAILURE_OBTAINING_RANDOM:110:failure obtaining random
 CMP_R_FAIL_INFO_OUT_OF_RANGE:129:fail info out of range
+CMP_R_GENERATE_CERTREQTEMPLATE:197:generate certreqtemplate
+CMP_R_GENERATE_CRLSTATUS:198:error creating crlstatus
 CMP_R_GETTING_GENP:192:getting genp
+CMP_R_GET_ITAV:199:get itav
 CMP_R_INVALID_ARGS:100:invalid args
 CMP_R_INVALID_GENP:193:invalid genp
+CMP_R_INVALID_KEYSPEC:202:invalid keyspec
 CMP_R_INVALID_OPTION:174:invalid option
 CMP_R_INVALID_ROOTCAKEYUPDATE:195:invalid rootcakeyupdate
 CMP_R_MISSING_CERTID:165:missing certid
@@ -276,6 +280,7 @@ CMP_R_TRANSACTIONID_UNMATCHED:152:transactionid unmatched
 CMP_R_TRANSFER_ERROR:159:transfer error
 CMP_R_UNCLEAN_CTX:191:unclean ctx
 CMP_R_UNEXPECTED_CERTPROFILE:196:unexpected certprofile
+CMP_R_UNEXPECTED_CRLSTATUSLIST:201:unexpected crlstatuslist
 CMP_R_UNEXPECTED_PKIBODY:133:unexpected pkibody
 CMP_R_UNEXPECTED_PKISTATUS:185:unexpected pkistatus
 CMP_R_UNEXPECTED_POLLREQ:105:unexpected pollreq
@@ -283,6 +288,7 @@ CMP_R_UNEXPECTED_PVNO:153:unexpected pvno
 CMP_R_UNEXPECTED_SENDER:106:unexpected sender
 CMP_R_UNKNOWN_ALGORITHM_ID:134:unknown algorithm id
 CMP_R_UNKNOWN_CERT_TYPE:135:unknown cert type
+CMP_R_UNKNOWN_CRL_ISSUER:200:unknown crl issuer
 CMP_R_UNKNOWN_PKISTATUS:186:unknown pkistatus
 CMP_R_UNSUPPORTED_ALGORITHM:136:unsupported algorithm
 CMP_R_UNSUPPORTED_KEY_TYPE:137:unsupported key type
@@ -837,6 +843,7 @@ HTTP_R_REDIRECTION_FROM_HTTPS_TO_HTTP:112:redirection from https to http
 HTTP_R_REDIRECTION_NOT_ENABLED:116:redirection not enabled
 HTTP_R_RESPONSE_LINE_TOO_LONG:113:response line too long
 HTTP_R_RESPONSE_PARSE_ERROR:104:response parse error
+HTTP_R_RESPONSE_TOO_MANY_HDRLINES:130:response too many hdrlines
 HTTP_R_RETRY_TIMEOUT:129:retry timeout
 HTTP_R_SERVER_CANCELED_CONNECTION:127:server canceled connection
 HTTP_R_SOCK_NOT_SUPPORTED:122:sock not supported
@@ -1395,6 +1402,7 @@ SSL_R_EMPTY_RAW_PUBLIC_KEY:349:empty raw public key
 SSL_R_EMPTY_SRTP_PROTECTION_PROFILE_LIST:354:empty srtp protection profile list
 SSL_R_ENCRYPTED_LENGTH_TOO_LONG:150:encrypted length too long
 SSL_R_ERROR_IN_RECEIVED_CIPHER_LIST:151:error in received cipher list
+SSL_R_ERROR_IN_SYSTEM_DEFAULT_CONFIG:419:error in system default config
 SSL_R_ERROR_SETTING_TLSA_BASE_DOMAIN:204:error setting tlsa base domain
 SSL_R_EXCEEDS_MAX_FRAGMENT_SIZE:194:exceeds max fragment size
 SSL_R_EXCESSIVE_MESSAGE_SIZE:152:excessive message size
@@ -1595,10 +1603,13 @@ SSL_R_TLSV1_ALERT_EXPORT_RESTRICTION:1060:tlsv1 alert export restriction
 SSL_R_TLSV1_ALERT_INAPPROPRIATE_FALLBACK:1086:tlsv1 alert inappropriate fallback
 SSL_R_TLSV1_ALERT_INSUFFICIENT_SECURITY:1071:tlsv1 alert insufficient security
 SSL_R_TLSV1_ALERT_INTERNAL_ERROR:1080:tlsv1 alert internal error
+SSL_R_TLSV1_ALERT_NO_APPLICATION_PROTOCOL:1120:\
+	tlsv1 alert no application protocol
 SSL_R_TLSV1_ALERT_NO_RENEGOTIATION:1100:tlsv1 alert no renegotiation
 SSL_R_TLSV1_ALERT_PROTOCOL_VERSION:1070:tlsv1 alert protocol version
 SSL_R_TLSV1_ALERT_RECORD_OVERFLOW:1022:tlsv1 alert record overflow
 SSL_R_TLSV1_ALERT_UNKNOWN_CA:1048:tlsv1 alert unknown ca
+SSL_R_TLSV1_ALERT_UNKNOWN_PSK_IDENTITY:1115:tlsv1 alert unknown psk identity
 SSL_R_TLSV1_ALERT_USER_CANCELLED:1090:tlsv1 alert user cancelled
 SSL_R_TLSV1_BAD_CERTIFICATE_HASH_VALUE:1114:tlsv1 bad certificate hash value
 SSL_R_TLSV1_BAD_CERTIFICATE_STATUS_RESPONSE:1113:\
@@ -1830,5 +1841,6 @@ X509_R_UNKNOWN_PURPOSE_ID:121:unknown purpose id
 X509_R_UNKNOWN_SIGID_ALGS:144:unknown sigid algs
 X509_R_UNKNOWN_TRUST_ID:120:unknown trust id
 X509_R_UNSUPPORTED_ALGORITHM:111:unsupported algorithm
+X509_R_UNSUPPORTED_VERSION:145:unsupported version
 X509_R_WRONG_LOOKUP_TYPE:112:wrong lookup type
 X509_R_WRONG_TYPE:122:wrong type

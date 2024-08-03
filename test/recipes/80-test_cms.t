@@ -40,6 +40,7 @@ my @defaultprov = ("-provider-path", $provpath,
 
 my @config = ( );
 my $provname = 'default';
+my $dsaallow = '1';
 
 my $datadir = srctop_dir("test", "recipes", "80-test_cms_data");
 my $smdir    = srctop_dir("test", "smime-certs");
@@ -50,13 +51,18 @@ my ($no_des, $no_dh, $no_dsa, $no_ec, $no_ec2m, $no_rc2, $no_zlib)
 
 $no_rc2 = 1 if disabled("legacy");
 
-plan tests => 23;
+plan tests => 25;
 
 ok(run(test(["pkcs7_test"])), "test pkcs7");
 
 unless ($no_fips) {
-    @config = ( "-config", srctop_file("test", "fips-and-base.cnf") );
+    my $provconf = srctop_file("test", "fips-and-base.cnf");
+    @config = ( "-config", $provconf );
     $provname = 'fips';
+
+    run(test(["fips_version_test", "-config", $provconf, "<3.4.0"]),
+    capture => 1, statusvar => \$dsaallow);
+    $no_dsa = 1 if $dsaallow == '0';
 }
 
 $ENV{OPENSSL_TEST_LIBCTX} = "1";
@@ -374,7 +380,7 @@ my @smime_cms_tests = (
     ],
 
     [ "encrypted content test streaming PEM format, triple DES key",
-      [ "{cmd1}", @prov, "-EncryptedData_encrypt", "-in", $smcont, "-outform", "PEM",
+      [ "{cmd1}", @defaultprov, "-EncryptedData_encrypt", "-in", $smcont, "-outform", "PEM",
         "-des3", "-secretkey", "000102030405060708090A0B0C0D0E0F1011121314151617",
         "-stream", "-out", "{output}.cms" ],
       [ "{cmd2}", @prov, "-EncryptedData_decrypt", "-in", "{output}.cms",
@@ -393,6 +399,13 @@ my @smime_cms_tests = (
         "-secretkey", "000102030405060708090A0B0C0D0E0F",
         "-out", "{output}.txt" ],
       \&final_compare
+    ],
+
+    [ "encrypted content test streaming PEM format -noout, 128 bit AES key",
+      [ "{cmd1}", @prov, "-EncryptedData_encrypt", "-in", $smcont, "-outform", "PEM",
+	"-aes128", "-secretkey", "000102030405060708090A0B0C0D0E0F",
+	"-stream", "-noout" ],
+      [ "{cmd2}", @prov, "-help" ]
     ],
 );
 
@@ -600,17 +613,17 @@ my @smime_cms_param_tests = (
     ],
 
     [ "enveloped content test streaming S/MIME format, ECDH, AES-128-CBC, SHA256 KDF",
-      [ "{cmd1}", @prov, "-encrypt", "-in", $smcont,
+      [ "{cmd1}", @defaultprov, "-encrypt", "-in", $smcont,
         "-stream", "-out", "{output}.cms",
         "-recip", catfile($smdir, "smec1.pem"), "-aes128",
         "-keyopt", "ecdh_kdf_md:sha256" ],
-      [ "{cmd2}", @prov, "-decrypt", "-recip", catfile($smdir, "smec1.pem"),
+      [ "{cmd2}", @defaultprov, "-decrypt", "-recip", catfile($smdir, "smec1.pem"),
         "-in", "{output}.cms", "-out", "{output}.txt" ],
       \&final_compare
     ],
 
     [ "enveloped content test streaming S/MIME format, ECDH, AES-128-GCM cipher, SHA256 KDF",
-      [ "{cmd1}", @prov, "-encrypt", "-in", $smcont,
+      [ "{cmd1}", @defaultprov, "-encrypt", "-in", $smcont,
         "-stream", "-out", "{output}.cms",
         "-recip", catfile($smdir, "smec1.pem"), "-aes-128-gcm", "-keyopt", "ecdh_kdf_md:sha256" ],
       [ "{cmd2}", "-decrypt", "-recip", catfile($smdir, "smec1.pem"),
@@ -619,11 +632,11 @@ my @smime_cms_param_tests = (
     ],
 
     [ "enveloped content test streaming S/MIME format, ECDH, K-283, cofactor DH",
-      [ "{cmd1}", @prov, "-encrypt", "-in", $smcont,
+      [ "{cmd1}", @defaultprov, "-encrypt", "-in", $smcont,
         "-stream", "-out", "{output}.cms",
         "-recip", catfile($smdir, "smec2.pem"), "-aes128",
         "-keyopt", "ecdh_kdf_md:sha256", "-keyopt", "ecdh_cofactor_mode:1" ],
-      [ "{cmd2}", @prov, "-decrypt", "-recip", catfile($smdir, "smec2.pem"),
+      [ "{cmd2}", @defaultprov, "-decrypt", "-recip", catfile($smdir, "smec2.pem"),
         "-in", "{output}.cms", "-out", "{output}.txt" ],
       \&final_compare
     ],
@@ -1035,6 +1048,53 @@ subtest "CMS signed digest, S/MIME format" => sub {
                     "-CAfile", catfile($smdir, "smroot.pem"),
                     "-content", $smcont])),
        "Verify CMS signed digest, S/MIME format");
+};
+
+sub path_tests {
+    our $app = shift;
+    our @path = qw(test certs);
+    our $key = srctop_file(@path, "ee-key.pem");
+    our $ee = srctop_file(@path, "ee-cert.pem");
+    our $ca = srctop_file(@path, "ca-cert.pem");
+    our $root = srctop_file(@path, "root-cert.pem");
+    our $sig_file = "signature.p7s";
+
+    sub sign {
+        my $inter = shift;
+        my @inter = $inter ? ("-certfile", $inter) : ();
+        my $msg = shift;
+        ok(run(app(["openssl", $app, @prov, "-sign", "-in", $smcont,
+                    "-inkey", $key, "-signer", $ee, @inter,
+                    "-out", $sig_file],
+                   "accept $app sign with EE $msg".
+                   " intermediate CA certificates")));
+    }
+    sub verify {
+        my $inter = shift;
+        my @inter = $inter ? ("-certfile", $inter) : ();
+        my $msg = shift;
+        my $res = shift;
+        ok($res == run(app(["openssl", $app, @prov, "-verify", "-in", $sig_file,
+                            "-purpose", "sslserver", "-CAfile", $root, @inter,
+                            "-content", $smcont],
+                           "accept $app verify with EE ".
+                           "$msg intermediate CA certificates")));
+    }
+    sign($ca, "and");
+    verify(0, "with included", 1);
+    sign(0, "without");
+    verify(0, "without", 0);
+    verify($ca, "with added", 1);
+};
+subtest "CMS sign+verify cert path tests" => sub {
+    plan tests => 5;
+
+    path_tests("cms");
+};
+subtest "PKCS7 sign+verify cert path tests" => sub {
+    plan tests => 5;
+
+    path_tests("smime");
 };
 
 subtest "CMS code signing test" => sub {

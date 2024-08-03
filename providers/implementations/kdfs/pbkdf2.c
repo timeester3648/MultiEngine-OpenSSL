@@ -90,7 +90,11 @@ static void *kdf_pbkdf2_new(void *provctx)
 static void kdf_pbkdf2_cleanup(KDF_PBKDF2 *ctx)
 {
     ossl_prov_digest_reset(&ctx->digest);
+#ifdef FIPS_MODULE
+    OPENSSL_clear_free(ctx->salt, ctx->salt_len);
+#else
     OPENSSL_free(ctx->salt);
+#endif
     OPENSSL_clear_free(ctx->pass, ctx->pass_len);
     memset(ctx, 0, sizeof(*ctx));
 }
@@ -202,12 +206,20 @@ static int kdf_pbkdf2_set_ctx_params(void *vctx, const OSSL_PARAM params[])
     OSSL_LIB_CTX *provctx = PROV_LIBCTX_OF(ctx->provctx);
     int pkcs5;
     uint64_t iter, min_iter;
+    const EVP_MD *md;
 
     if (params == NULL)
         return 1;
 
-    if (!ossl_prov_digest_load_from_params(&ctx->digest, params, provctx))
-        return 0;
+    if (OSSL_PARAM_locate_const(params, OSSL_ALG_PARAM_DIGEST) != NULL) {
+        if (!ossl_prov_digest_load_from_params(&ctx->digest, params, provctx))
+            return 0;
+        md = ossl_prov_digest_md(&ctx->digest);
+        if ((EVP_MD_get_flags(md) & EVP_MD_FLAG_XOF) != 0) {
+            ERR_raise(ERR_LIB_PROV, PROV_R_XOF_DIGESTS_NOT_ALLOWED);
+            return 0;
+        }
+    }
 
     if ((p = OSSL_PARAM_locate_const(params, OSSL_KDF_PARAM_PKCS5)) != NULL) {
         if (!OSSL_PARAM_get_int(p, &pkcs5))

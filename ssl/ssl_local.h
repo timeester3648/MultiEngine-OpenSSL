@@ -1,5 +1,5 @@
 /*
- * Copyright 1995-2023 The OpenSSL Project Authors. All Rights Reserved.
+ * Copyright 1995-2024 The OpenSSL Project Authors. All Rights Reserved.
  * Copyright (c) 2002, Oracle and/or its affiliates. All rights reserved
  * Copyright 2005 Nokia. All rights reserved.
  *
@@ -37,6 +37,7 @@
 # include "internal/ktls.h"
 # include "internal/time.h"
 # include "internal/ssl.h"
+# include "internal/cryptlib.h"
 # include "record/record.h"
 
 # ifdef OPENSSL_BUILD_SHLIBSSL
@@ -274,9 +275,6 @@
 # define SSL_IS_FIRST_HANDSHAKE(s) ((s)->s3.tmp.finish_md_len == 0 \
                                     || (s)->s3.tmp.peer_finish_md_len == 0)
 
-/* See if we need explicit IV */
-# define SSL_USE_EXPLICIT_IV(s)  \
-    (SSL_CONNECTION_GET_SSL(s)->method->ssl3_enc->enc_flags & SSL_ENC_FLAG_EXPLICIT_IV)
 /*
  * See if we use signature algorithms extension and signature algorithm
  * before signatures.
@@ -421,7 +419,7 @@ struct ssl_cipher_st {
 struct ssl_method_st {
     int version;
     unsigned flags;
-    unsigned long mask;
+    uint64_t mask;
     SSL *(*ssl_new) (SSL_CTX *ctx);
     void (*ssl_free) (SSL *s);
     int (*ssl_reset) (SSL *s);
@@ -532,7 +530,6 @@ struct ssl_session_st {
      * certificate is not ok, we must remember the error for session reuse:
      */
     long verify_result;         /* only for servers */
-    CRYPTO_REF_COUNT references;
     OSSL_TIME timeout;
     OSSL_TIME time;
     OSSL_TIME calc_timeout;
@@ -542,11 +539,6 @@ struct ssl_session_st {
                                  * load the 'cipher' structure */
     unsigned int kex_group;      /* TLS group from key exchange */
     CRYPTO_EX_DATA ex_data;     /* application specific data */
-    /*
-     * These are used to make removal of session-ids more efficient and to
-     * implement a maximum cache size.
-     */
-    struct ssl_session_st *prev, *next;
 
     struct {
         char *hostname;
@@ -576,6 +568,13 @@ struct ssl_session_st {
     size_t ticket_appdata_len;
     uint32_t flags;
     SSL_CTX *owner;
+
+    /*
+     * These are used to make removal of session-ids more efficient and to
+     * implement a maximum cache size. Access requires protection of ctx->lock.
+     */
+    struct ssl_session_st *prev, *next;
+    CRYPTO_REF_COUNT references;
 };
 
 /* Extended master secret support */
@@ -640,11 +639,6 @@ typedef enum {
 
 #define MAX_COMPRESSIONS_SIZE   255
 
-struct ssl_comp_st {
-    int id;
-    const char *name;
-    COMP_METHOD *method;
-};
 
 typedef struct raw_extension_st {
     /* Raw packet data for the extension */
@@ -1132,6 +1126,7 @@ struct ssl_ctx_st {
     size_t (*record_padding_cb)(SSL *s, int type, size_t len, void *arg);
     void *record_padding_arg;
     size_t block_padding;
+    size_t hs_padding;
 
     /* Session ticket appdata */
     SSL_CTX_generate_session_ticket_fn generate_ticket_cb;
@@ -2156,8 +2151,6 @@ typedef struct ssl3_enc_method {
 
 /* Values for enc_flags */
 
-/* Uses explicit IV for CBC mode */
-# define SSL_ENC_FLAG_EXPLICIT_IV        0x1
 /* Uses signature algorithms extension */
 # define SSL_ENC_FLAG_SIGALGS            0x2
 /* Uses SHA256 default PRF */
@@ -2500,6 +2493,9 @@ __owur int ossl_bytes_to_cipher_list(SSL_CONNECTION *s, PACKET *cipher_suites,
 void ssl_update_cache(SSL_CONNECTION *s, int mode);
 __owur int ssl_cipher_get_evp_cipher(SSL_CTX *ctx, const SSL_CIPHER *sslc,
                                      const EVP_CIPHER **enc);
+__owur int ssl_cipher_get_evp_md_mac(SSL_CTX *ctx, const SSL_CIPHER *sslc,
+                                     const EVP_MD **md,
+                                     int *mac_pkey_type, size_t *mac_secret_size);
 __owur int ssl_cipher_get_evp(SSL_CTX *ctxc, const SSL_SESSION *s,
                               const EVP_CIPHER **enc, const EVP_MD **md,
                               int *mac_pkey_type, size_t *mac_secret_size,
@@ -2801,7 +2797,7 @@ __owur int tls_use_ticket(SSL_CONNECTION *s);
 
 void ssl_set_sig_mask(uint32_t *pmask_a, SSL_CONNECTION *s, int op);
 
-__owur int tls1_set_sigalgs_list(CERT *c, const char *str, int client);
+__owur int tls1_set_sigalgs_list(SSL_CTX *ctx, CERT *c, const char *str, int client);
 __owur int tls1_set_raw_sigalgs(CERT *c, const uint16_t *psigs, size_t salglen,
                                 int client);
 __owur int tls1_set_sigalgs(CERT *c, const int *salg, size_t salglen,
@@ -2919,7 +2915,7 @@ void custom_exts_free(custom_ext_methods *exts);
 void ssl_comp_free_compression_methods_int(void);
 
 /* ssl_mcnf.c */
-void ssl_ctx_system_config(SSL_CTX *ctx);
+int ssl_ctx_system_config(SSL_CTX *ctx);
 
 const EVP_CIPHER *ssl_evp_cipher_fetch(OSSL_LIB_CTX *libctx,
                                        int nid,

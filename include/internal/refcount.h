@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 The OpenSSL Project Authors. All Rights Reserved.
+ * Copyright 2016-2024 The OpenSSL Project Authors. All Rights Reserved.
  *
  * Licensed under the Apache License 2.0 (the "License").  You may not use
  * this file except in compliance with the License.  You can obtain a copy
@@ -199,7 +199,7 @@ typedef struct {
 
 #  ifdef OPENSSL_THREADS
 
-static ossl_unused ossl_inline int CRYPTO_UP_REF(CRYPTO_REF_COUNT *refcnt, 
+static ossl_unused ossl_inline int CRYPTO_UP_REF(CRYPTO_REF_COUNT *refcnt,
                                                  int *ret)
 {
     return CRYPTO_atomic_add(&refcnt->val, 1, ret, refcnt->lock);
@@ -237,7 +237,7 @@ static ossl_unused ossl_inline void CRYPTO_FREE_REF(CRYPTO_REF_COUNT *refcnt)   
 
 #  else     /* OPENSSL_THREADS */
 
-static ossl_unused ossl_inline int CRYPTO_UP_REF(CRYPTO_REF_COUNT *refcnt, 
+static ossl_unused ossl_inline int CRYPTO_UP_REF(CRYPTO_REF_COUNT *refcnt,
                                                  int *ret)
 {
     refcnt->val++;

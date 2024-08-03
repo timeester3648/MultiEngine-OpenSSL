@@ -783,6 +783,10 @@ DEPEND[html/man3/BUF_MEM_new.html]=man3/BUF_MEM_new.pod
 GENERATE[html/man3/BUF_MEM_new.html]=man3/BUF_MEM_new.pod
 DEPEND[man/man3/BUF_MEM_new.3]=man3/BUF_MEM_new.pod
 GENERATE[man/man3/BUF_MEM_new.3]=man3/BUF_MEM_new.pod
+DEPEND[html/man3/CMAC_CTX.html]=man3/CMAC_CTX.pod
+GENERATE[html/man3/CMAC_CTX.html]=man3/CMAC_CTX.pod
+DEPEND[man/man3/CMAC_CTX.3]=man3/CMAC_CTX.pod
+GENERATE[man/man3/CMAC_CTX.3]=man3/CMAC_CTX.pod
 DEPEND[html/man3/CMS_EncryptedData_decrypt.html]=man3/CMS_EncryptedData_decrypt.pod
 GENERATE[html/man3/CMS_EncryptedData_decrypt.html]=man3/CMS_EncryptedData_decrypt.pod
 DEPEND[man/man3/CMS_EncryptedData_decrypt.3]=man3/CMS_EncryptedData_decrypt.pod
@@ -1471,6 +1475,10 @@ DEPEND[html/man3/EVP_whirlpool.html]=man3/EVP_whirlpool.pod
 GENERATE[html/man3/EVP_whirlpool.html]=man3/EVP_whirlpool.pod
 DEPEND[man/man3/EVP_whirlpool.3]=man3/EVP_whirlpool.pod
 GENERATE[man/man3/EVP_whirlpool.3]=man3/EVP_whirlpool.pod
+DEPEND[html/man3/GENERAL_NAME.html]=man3/GENERAL_NAME.pod
+GENERATE[html/man3/GENERAL_NAME.html]=man3/GENERAL_NAME.pod
+DEPEND[man/man3/GENERAL_NAME.3]=man3/GENERAL_NAME.pod
+GENERATE[man/man3/GENERAL_NAME.3]=man3/GENERAL_NAME.pod
 DEPEND[html/man3/HMAC.html]=man3/HMAC.pod
 GENERATE[html/man3/HMAC.html]=man3/HMAC.pod
 DEPEND[man/man3/HMAC.3]=man3/HMAC.pod
@@ -1571,6 +1579,10 @@ DEPEND[html/man3/OPENSSL_malloc.html]=man3/OPENSSL_malloc.pod
 GENERATE[html/man3/OPENSSL_malloc.html]=man3/OPENSSL_malloc.pod
 DEPEND[man/man3/OPENSSL_malloc.3]=man3/OPENSSL_malloc.pod
 GENERATE[man/man3/OPENSSL_malloc.3]=man3/OPENSSL_malloc.pod
+DEPEND[html/man3/OPENSSL_riscvcap.html]=man3/OPENSSL_riscvcap.pod
+GENERATE[html/man3/OPENSSL_riscvcap.html]=man3/OPENSSL_riscvcap.pod
+DEPEND[man/man3/OPENSSL_riscvcap.3]=man3/OPENSSL_riscvcap.pod
+GENERATE[man/man3/OPENSSL_riscvcap.3]=man3/OPENSSL_riscvcap.pod
 DEPEND[html/man3/OPENSSL_s390xcap.html]=man3/OPENSSL_s390xcap.pod
 GENERATE[html/man3/OPENSSL_s390xcap.html]=man3/OPENSSL_s390xcap.pod
 DEPEND[man/man3/OPENSSL_s390xcap.3]=man3/OPENSSL_s390xcap.pod
@@ -1591,6 +1603,10 @@ DEPEND[html/man3/OSSL_CALLBACK.html]=man3/OSSL_CALLBACK.pod
 GENERATE[html/man3/OSSL_CALLBACK.html]=man3/OSSL_CALLBACK.pod
 DEPEND[man/man3/OSSL_CALLBACK.3]=man3/OSSL_CALLBACK.pod
 GENERATE[man/man3/OSSL_CALLBACK.3]=man3/OSSL_CALLBACK.pod
+DEPEND[html/man3/OSSL_CMP_ATAV_set0.html]=man3/OSSL_CMP_ATAV_set0.pod
+GENERATE[html/man3/OSSL_CMP_ATAV_set0.html]=man3/OSSL_CMP_ATAV_set0.pod
+DEPEND[man/man3/OSSL_CMP_ATAV_set0.3]=man3/OSSL_CMP_ATAV_set0.pod
+GENERATE[man/man3/OSSL_CMP_ATAV_set0.3]=man3/OSSL_CMP_ATAV_set0.pod
 DEPEND[html/man3/OSSL_CMP_CTX_new.html]=man3/OSSL_CMP_CTX_new.pod
 GENERATE[html/man3/OSSL_CMP_CTX_new.html]=man3/OSSL_CMP_CTX_new.pod
 DEPEND[man/man3/OSSL_CMP_CTX_new.3]=man3/OSSL_CMP_CTX_new.pod
@@ -1703,6 +1719,10 @@ DEPEND[html/man3/OSSL_ESS_check_signing_certs.html]=man3/OSSL_ESS_check_signing_
 GENERATE[html/man3/OSSL_ESS_check_signing_certs.html]=man3/OSSL_ESS_check_signing_certs.pod
 DEPEND[man/man3/OSSL_ESS_check_signing_certs.3]=man3/OSSL_ESS_check_signing_certs.pod
 GENERATE[man/man3/OSSL_ESS_check_signing_certs.3]=man3/OSSL_ESS_check_signing_certs.pod
+DEPEND[html/man3/OSSL_GENERAL_NAMES_print.html]=man3/OSSL_GENERAL_NAMES_print.pod
+GENERATE[html/man3/OSSL_GENERAL_NAMES_print.html]=man3/OSSL_GENERAL_NAMES_print.pod
+DEPEND[man/man3/OSSL_GENERAL_NAMES_print.3]=man3/OSSL_GENERAL_NAMES_print.pod
+GENERATE[man/man3/OSSL_GENERAL_NAMES_print.3]=man3/OSSL_GENERAL_NAMES_print.pod
 DEPEND[html/man3/OSSL_HPKE_CTX_new.html]=man3/OSSL_HPKE_CTX_new.pod
 GENERATE[html/man3/OSSL_HPKE_CTX_new.html]=man3/OSSL_HPKE_CTX_new.pod
 DEPEND[man/man3/OSSL_HPKE_CTX_new.3]=man3/OSSL_HPKE_CTX_new.pod
@@ -1719,6 +1739,18 @@ DEPEND[html/man3/OSSL_HTTP_transfer.html]=man3/OSSL_HTTP_transfer.pod
 GENERATE[html/man3/OSSL_HTTP_transfer.html]=man3/OSSL_HTTP_transfer.pod
 DEPEND[man/man3/OSSL_HTTP_transfer.3]=man3/OSSL_HTTP_transfer.pod
 GENERATE[man/man3/OSSL_HTTP_transfer.3]=man3/OSSL_HTTP_transfer.pod
+DEPEND[html/man3/OSSL_IETF_ATTR_SYNTAX.html]=man3/OSSL_IETF_ATTR_SYNTAX.pod
+GENERATE[html/man3/OSSL_IETF_ATTR_SYNTAX.html]=man3/OSSL_IETF_ATTR_SYNTAX.pod
+DEPEND[man/man3/OSSL_IETF_ATTR_SYNTAX.3]=man3/OSSL_IETF_ATTR_SYNTAX.pod
+GENERATE[man/man3/OSSL_IETF_ATTR_SYNTAX.3]=man3/OSSL_IETF_ATTR_SYNTAX.pod
+DEPEND[html/man3/OSSL_IETF_ATTR_SYNTAX_print.html]=man3/OSSL_IETF_ATTR_SYNTAX_print.pod
+GENERATE[html/man3/OSSL_IETF_ATTR_SYNTAX_print.html]=man3/OSSL_IETF_ATTR_SYNTAX_print.pod
+DEPEND[man/man3/OSSL_IETF_ATTR_SYNTAX_print.3]=man3/OSSL_IETF_ATTR_SYNTAX_print.pod
+GENERATE[man/man3/OSSL_IETF_ATTR_SYNTAX_print.3]=man3/OSSL_IETF_ATTR_SYNTAX_print.pod
+DEPEND[html/man3/OSSL_INDICATOR_set_callback.html]=man3/OSSL_INDICATOR_set_callback.pod
+GENERATE[html/man3/OSSL_INDICATOR_set_callback.html]=man3/OSSL_INDICATOR_set_callback.pod
+DEPEND[man/man3/OSSL_INDICATOR_set_callback.3]=man3/OSSL_INDICATOR_set_callback.pod
+GENERATE[man/man3/OSSL_INDICATOR_set_callback.3]=man3/OSSL_INDICATOR_set_callback.pod
 DEPEND[html/man3/OSSL_ITEM.html]=man3/OSSL_ITEM.pod
 GENERATE[html/man3/OSSL_ITEM.html]=man3/OSSL_ITEM.pod
 DEPEND[man/man3/OSSL_ITEM.3]=man3/OSSL_ITEM.pod
@@ -1727,6 +1759,10 @@ DEPEND[html/man3/OSSL_LIB_CTX.html]=man3/OSSL_LIB_CTX.pod
 GENERATE[html/man3/OSSL_LIB_CTX.html]=man3/OSSL_LIB_CTX.pod
 DEPEND[man/man3/OSSL_LIB_CTX.3]=man3/OSSL_LIB_CTX.pod
 GENERATE[man/man3/OSSL_LIB_CTX.3]=man3/OSSL_LIB_CTX.pod
+DEPEND[html/man3/OSSL_LIB_CTX_set_conf_diagnostics.html]=man3/OSSL_LIB_CTX_set_conf_diagnostics.pod
+GENERATE[html/man3/OSSL_LIB_CTX_set_conf_diagnostics.html]=man3/OSSL_LIB_CTX_set_conf_diagnostics.pod
+DEPEND[man/man3/OSSL_LIB_CTX_set_conf_diagnostics.3]=man3/OSSL_LIB_CTX_set_conf_diagnostics.pod
+GENERATE[man/man3/OSSL_LIB_CTX_set_conf_diagnostics.3]=man3/OSSL_LIB_CTX_set_conf_diagnostics.pod
 DEPEND[html/man3/OSSL_PARAM.html]=man3/OSSL_PARAM.pod
 GENERATE[html/man3/OSSL_PARAM.html]=man3/OSSL_PARAM.pod
 DEPEND[man/man3/OSSL_PARAM.3]=man3/OSSL_PARAM.pod
@@ -2735,6 +2771,10 @@ DEPEND[html/man3/SSL_set_session.html]=man3/SSL_set_session.pod
 GENERATE[html/man3/SSL_set_session.html]=man3/SSL_set_session.pod
 DEPEND[man/man3/SSL_set_session.3]=man3/SSL_set_session.pod
 GENERATE[man/man3/SSL_set_session.3]=man3/SSL_set_session.pod
+DEPEND[html/man3/SSL_set_session_secret_cb.html]=man3/SSL_set_session_secret_cb.pod
+GENERATE[html/man3/SSL_set_session_secret_cb.html]=man3/SSL_set_session_secret_cb.pod
+DEPEND[man/man3/SSL_set_session_secret_cb.3]=man3/SSL_set_session_secret_cb.pod
+GENERATE[man/man3/SSL_set_session_secret_cb.3]=man3/SSL_set_session_secret_cb.pod
 DEPEND[html/man3/SSL_set_shutdown.html]=man3/SSL_set_shutdown.pod
 GENERATE[html/man3/SSL_set_shutdown.html]=man3/SSL_set_shutdown.pod
 DEPEND[man/man3/SSL_set_shutdown.3]=man3/SSL_set_shutdown.pod
@@ -2771,10 +2811,10 @@ DEPEND[html/man3/TS_RESP_CTX_new.html]=man3/TS_RESP_CTX_new.pod
 GENERATE[html/man3/TS_RESP_CTX_new.html]=man3/TS_RESP_CTX_new.pod
 DEPEND[man/man3/TS_RESP_CTX_new.3]=man3/TS_RESP_CTX_new.pod
 GENERATE[man/man3/TS_RESP_CTX_new.3]=man3/TS_RESP_CTX_new.pod
-DEPEND[html/man3/TS_VERIFY_CTX_set_certs.html]=man3/TS_VERIFY_CTX_set_certs.pod
-GENERATE[html/man3/TS_VERIFY_CTX_set_certs.html]=man3/TS_VERIFY_CTX_set_certs.pod
-DEPEND[man/man3/TS_VERIFY_CTX_set_certs.3]=man3/TS_VERIFY_CTX_set_certs.pod
-GENERATE[man/man3/TS_VERIFY_CTX_set_certs.3]=man3/TS_VERIFY_CTX_set_certs.pod
+DEPEND[html/man3/TS_VERIFY_CTX.html]=man3/TS_VERIFY_CTX.pod
+GENERATE[html/man3/TS_VERIFY_CTX.html]=man3/TS_VERIFY_CTX.pod
+DEPEND[man/man3/TS_VERIFY_CTX.3]=man3/TS_VERIFY_CTX.pod
+GENERATE[man/man3/TS_VERIFY_CTX.3]=man3/TS_VERIFY_CTX.pod
 DEPEND[html/man3/UI_STRING.html]=man3/UI_STRING.pod
 GENERATE[html/man3/UI_STRING.html]=man3/UI_STRING.pod
 DEPEND[man/man3/UI_STRING.3]=man3/UI_STRING.pod
@@ -2799,6 +2839,26 @@ DEPEND[html/man3/X509V3_set_ctx.html]=man3/X509V3_set_ctx.pod
 GENERATE[html/man3/X509V3_set_ctx.html]=man3/X509V3_set_ctx.pod
 DEPEND[man/man3/X509V3_set_ctx.3]=man3/X509V3_set_ctx.pod
 GENERATE[man/man3/X509V3_set_ctx.3]=man3/X509V3_set_ctx.pod
+DEPEND[html/man3/X509_ACERT_add1_attr.html]=man3/X509_ACERT_add1_attr.pod
+GENERATE[html/man3/X509_ACERT_add1_attr.html]=man3/X509_ACERT_add1_attr.pod
+DEPEND[man/man3/X509_ACERT_add1_attr.3]=man3/X509_ACERT_add1_attr.pod
+GENERATE[man/man3/X509_ACERT_add1_attr.3]=man3/X509_ACERT_add1_attr.pod
+DEPEND[html/man3/X509_ACERT_add_attr_nconf.html]=man3/X509_ACERT_add_attr_nconf.pod
+GENERATE[html/man3/X509_ACERT_add_attr_nconf.html]=man3/X509_ACERT_add_attr_nconf.pod
+DEPEND[man/man3/X509_ACERT_add_attr_nconf.3]=man3/X509_ACERT_add_attr_nconf.pod
+GENERATE[man/man3/X509_ACERT_add_attr_nconf.3]=man3/X509_ACERT_add_attr_nconf.pod
+DEPEND[html/man3/X509_ACERT_get0_holder_baseCertId.html]=man3/X509_ACERT_get0_holder_baseCertId.pod
+GENERATE[html/man3/X509_ACERT_get0_holder_baseCertId.html]=man3/X509_ACERT_get0_holder_baseCertId.pod
+DEPEND[man/man3/X509_ACERT_get0_holder_baseCertId.3]=man3/X509_ACERT_get0_holder_baseCertId.pod
+GENERATE[man/man3/X509_ACERT_get0_holder_baseCertId.3]=man3/X509_ACERT_get0_holder_baseCertId.pod
+DEPEND[html/man3/X509_ACERT_get_attr.html]=man3/X509_ACERT_get_attr.pod
+GENERATE[html/man3/X509_ACERT_get_attr.html]=man3/X509_ACERT_get_attr.pod
+DEPEND[man/man3/X509_ACERT_get_attr.3]=man3/X509_ACERT_get_attr.pod
+GENERATE[man/man3/X509_ACERT_get_attr.3]=man3/X509_ACERT_get_attr.pod
+DEPEND[html/man3/X509_ACERT_print_ex.html]=man3/X509_ACERT_print_ex.pod
+GENERATE[html/man3/X509_ACERT_print_ex.html]=man3/X509_ACERT_print_ex.pod
+DEPEND[man/man3/X509_ACERT_print_ex.3]=man3/X509_ACERT_print_ex.pod
+GENERATE[man/man3/X509_ACERT_print_ex.3]=man3/X509_ACERT_print_ex.pod
 DEPEND[html/man3/X509_ALGOR_dup.html]=man3/X509_ALGOR_dup.pod
 GENERATE[html/man3/X509_ALGOR_dup.html]=man3/X509_ALGOR_dup.pod
 DEPEND[man/man3/X509_ALGOR_dup.3]=man3/X509_ALGOR_dup.pod
@@ -3127,6 +3187,7 @@ html/man3/BN_set_bit.html \
 html/man3/BN_swap.html \
 html/man3/BN_zero.html \
 html/man3/BUF_MEM_new.html \
+html/man3/CMAC_CTX.html \
 html/man3/CMS_EncryptedData_decrypt.html \
 html/man3/CMS_EncryptedData_encrypt.html \
 html/man3/CMS_EnvelopedData_create.html \
@@ -3299,6 +3360,7 @@ html/man3/EVP_sha3_224.html \
 html/man3/EVP_sm3.html \
 html/man3/EVP_sm4_cbc.html \
 html/man3/EVP_whirlpool.html \
+html/man3/GENERAL_NAME.html \
 html/man3/HMAC.html \
 html/man3/MD5.html \
 html/man3/MDC2_Init.html \
@@ -3324,11 +3386,13 @@ html/man3/OPENSSL_init_ssl.html \
 html/man3/OPENSSL_instrument_bus.html \
 html/man3/OPENSSL_load_builtin_modules.html \
 html/man3/OPENSSL_malloc.html \
+html/man3/OPENSSL_riscvcap.html \
 html/man3/OPENSSL_s390xcap.html \
 html/man3/OPENSSL_secure_malloc.html \
 html/man3/OPENSSL_strcasecmp.html \
 html/man3/OSSL_ALGORITHM.html \
 html/man3/OSSL_CALLBACK.html \
+html/man3/OSSL_CMP_ATAV_set0.html \
 html/man3/OSSL_CMP_CTX_new.html \
 html/man3/OSSL_CMP_HDR_get0_transactionID.html \
 html/man3/OSSL_CMP_ITAV_new_caCerts.html \
@@ -3357,12 +3421,17 @@ html/man3/OSSL_ENCODER_CTX_new_for_pkey.html \
 html/man3/OSSL_ENCODER_to_bio.html \
 html/man3/OSSL_ERR_STATE_save.html \
 html/man3/OSSL_ESS_check_signing_certs.html \
+html/man3/OSSL_GENERAL_NAMES_print.html \
 html/man3/OSSL_HPKE_CTX_new.html \
 html/man3/OSSL_HTTP_REQ_CTX.html \
 html/man3/OSSL_HTTP_parse_url.html \
 html/man3/OSSL_HTTP_transfer.html \
+html/man3/OSSL_IETF_ATTR_SYNTAX.html \
+html/man3/OSSL_IETF_ATTR_SYNTAX_print.html \
+html/man3/OSSL_INDICATOR_set_callback.html \
 html/man3/OSSL_ITEM.html \
 html/man3/OSSL_LIB_CTX.html \
+html/man3/OSSL_LIB_CTX_set_conf_diagnostics.html \
 html/man3/OSSL_PARAM.html \
 html/man3/OSSL_PARAM_BLD.html \
 html/man3/OSSL_PARAM_allocate_from_text.html \
@@ -3615,6 +3684,7 @@ html/man3/SSL_set_fd.html \
 html/man3/SSL_set_incoming_stream_policy.html \
 html/man3/SSL_set_retry_verify.html \
 html/man3/SSL_set_session.html \
+html/man3/SSL_set_session_secret_cb.html \
 html/man3/SSL_set_shutdown.html \
 html/man3/SSL_set_verify_result.html \
 html/man3/SSL_shutdown.html \
@@ -3624,13 +3694,18 @@ html/man3/SSL_stream_reset.html \
 html/man3/SSL_want.html \
 html/man3/SSL_write.html \
 html/man3/TS_RESP_CTX_new.html \
-html/man3/TS_VERIFY_CTX_set_certs.html \
+html/man3/TS_VERIFY_CTX.html \
 html/man3/UI_STRING.html \
 html/man3/UI_UTIL_read_pw.html \
 html/man3/UI_create_method.html \
 html/man3/UI_new.html \
 html/man3/X509V3_get_d2i.html \
 html/man3/X509V3_set_ctx.html \
+html/man3/X509_ACERT_add1_attr.html \
+html/man3/X509_ACERT_add_attr_nconf.html \
+html/man3/X509_ACERT_get0_holder_baseCertId.html \
+html/man3/X509_ACERT_get_attr.html \
+html/man3/X509_ACERT_print_ex.html \
 html/man3/X509_ALGOR_dup.html \
 html/man3/X509_ATTRIBUTE.html \
 html/man3/X509_CRL_get0_by_serial.html \
@@ -3772,6 +3847,7 @@ man/man3/BN_set_bit.3 \
 man/man3/BN_swap.3 \
 man/man3/BN_zero.3 \
 man/man3/BUF_MEM_new.3 \
+man/man3/CMAC_CTX.3 \
 man/man3/CMS_EncryptedData_decrypt.3 \
 man/man3/CMS_EncryptedData_encrypt.3 \
 man/man3/CMS_EnvelopedData_create.3 \
@@ -3944,6 +4020,7 @@ man/man3/EVP_sha3_224.3 \
 man/man3/EVP_sm3.3 \
 man/man3/EVP_sm4_cbc.3 \
 man/man3/EVP_whirlpool.3 \
+man/man3/GENERAL_NAME.3 \
 man/man3/HMAC.3 \
 man/man3/MD5.3 \
 man/man3/MDC2_Init.3 \
@@ -3969,11 +4046,13 @@ man/man3/OPENSSL_init_ssl.3 \
 man/man3/OPENSSL_instrument_bus.3 \
 man/man3/OPENSSL_load_builtin_modules.3 \
 man/man3/OPENSSL_malloc.3 \
+man/man3/OPENSSL_riscvcap.3 \
 man/man3/OPENSSL_s390xcap.3 \
 man/man3/OPENSSL_secure_malloc.3 \
 man/man3/OPENSSL_strcasecmp.3 \
 man/man3/OSSL_ALGORITHM.3 \
 man/man3/OSSL_CALLBACK.3 \
+man/man3/OSSL_CMP_ATAV_set0.3 \
 man/man3/OSSL_CMP_CTX_new.3 \
 man/man3/OSSL_CMP_HDR_get0_transactionID.3 \
 man/man3/OSSL_CMP_ITAV_new_caCerts.3 \
@@ -4002,12 +4081,17 @@ man/man3/OSSL_ENCODER_CTX_new_for_pkey.3 \
 man/man3/OSSL_ENCODER_to_bio.3 \
 man/man3/OSSL_ERR_STATE_save.3 \
 man/man3/OSSL_ESS_check_signing_certs.3 \
+man/man3/OSSL_GENERAL_NAMES_print.3 \
 man/man3/OSSL_HPKE_CTX_new.3 \
 man/man3/OSSL_HTTP_REQ_CTX.3 \
 man/man3/OSSL_HTTP_parse_url.3 \
 man/man3/OSSL_HTTP_transfer.3 \
+man/man3/OSSL_IETF_ATTR_SYNTAX.3 \
+man/man3/OSSL_IETF_ATTR_SYNTAX_print.3 \
+man/man3/OSSL_INDICATOR_set_callback.3 \
 man/man3/OSSL_ITEM.3 \
 man/man3/OSSL_LIB_CTX.3 \
+man/man3/OSSL_LIB_CTX_set_conf_diagnostics.3 \
 man/man3/OSSL_PARAM.3 \
 man/man3/OSSL_PARAM_BLD.3 \
 man/man3/OSSL_PARAM_allocate_from_text.3 \
@@ -4260,6 +4344,7 @@ man/man3/SSL_set_fd.3 \
 man/man3/SSL_set_incoming_stream_policy.3 \
 man/man3/SSL_set_retry_verify.3 \
 man/man3/SSL_set_session.3 \
+man/man3/SSL_set_session_secret_cb.3 \
 man/man3/SSL_set_shutdown.3 \
 man/man3/SSL_set_verify_result.3 \
 man/man3/SSL_shutdown.3 \
@@ -4269,13 +4354,18 @@ man/man3/SSL_stream_reset.3 \
 man/man3/SSL_want.3 \
 man/man3/SSL_write.3 \
 man/man3/TS_RESP_CTX_new.3 \
-man/man3/TS_VERIFY_CTX_set_certs.3 \
+man/man3/TS_VERIFY_CTX.3 \
 man/man3/UI_STRING.3 \
 man/man3/UI_UTIL_read_pw.3 \
 man/man3/UI_create_method.3 \
 man/man3/UI_new.3 \
 man/man3/X509V3_get_d2i.3 \
 man/man3/X509V3_set_ctx.3 \
+man/man3/X509_ACERT_add1_attr.3 \
+man/man3/X509_ACERT_add_attr_nconf.3 \
+man/man3/X509_ACERT_get0_holder_baseCertId.3 \
+man/man3/X509_ACERT_get_attr.3 \
+man/man3/X509_ACERT_print_ex.3 \
 man/man3/X509_ALGOR_dup.3 \
 man/man3/X509_ATTRIBUTE.3 \
 man/man3/X509_CRL_get0_by_serial.3 \
@@ -4649,6 +4739,10 @@ DEPEND[html/man7/EVP_RAND-HMAC-DRBG.html]=man7/EVP_RAND-HMAC-DRBG.pod
 GENERATE[html/man7/EVP_RAND-HMAC-DRBG.html]=man7/EVP_RAND-HMAC-DRBG.pod
 DEPEND[man/man7/EVP_RAND-HMAC-DRBG.7]=man7/EVP_RAND-HMAC-DRBG.pod
 GENERATE[man/man7/EVP_RAND-HMAC-DRBG.7]=man7/EVP_RAND-HMAC-DRBG.pod
+DEPEND[html/man7/EVP_RAND-JITTER.html]=man7/EVP_RAND-JITTER.pod
+GENERATE[html/man7/EVP_RAND-JITTER.html]=man7/EVP_RAND-JITTER.pod
+DEPEND[man/man7/EVP_RAND-JITTER.7]=man7/EVP_RAND-JITTER.pod
+GENERATE[man/man7/EVP_RAND-JITTER.7]=man7/EVP_RAND-JITTER.pod
 DEPEND[html/man7/EVP_RAND-SEED-SRC.html]=man7/EVP_RAND-SEED-SRC.pod
 GENERATE[html/man7/EVP_RAND-SEED-SRC.html]=man7/EVP_RAND-SEED-SRC.pod
 DEPEND[man/man7/EVP_RAND-SEED-SRC.7]=man7/EVP_RAND-SEED-SRC.pod
@@ -4701,6 +4795,10 @@ DEPEND[html/man7/OSSL_PROVIDER-null.html]=man7/OSSL_PROVIDER-null.pod
 GENERATE[html/man7/OSSL_PROVIDER-null.html]=man7/OSSL_PROVIDER-null.pod
 DEPEND[man/man7/OSSL_PROVIDER-null.7]=man7/OSSL_PROVIDER-null.pod
 GENERATE[man/man7/OSSL_PROVIDER-null.7]=man7/OSSL_PROVIDER-null.pod
+DEPEND[html/man7/OSSL_STORE-winstore.html]=man7/OSSL_STORE-winstore.pod
+GENERATE[html/man7/OSSL_STORE-winstore.html]=man7/OSSL_STORE-winstore.pod
+DEPEND[man/man7/OSSL_STORE-winstore.7]=man7/OSSL_STORE-winstore.pod
+GENERATE[man/man7/OSSL_STORE-winstore.7]=man7/OSSL_STORE-winstore.pod
 DEPEND[html/man7/RAND.html]=man7/RAND.pod
 GENERATE[html/man7/RAND.html]=man7/RAND.pod
 DEPEND[man/man7/RAND.7]=man7/RAND.pod
@@ -4843,6 +4941,10 @@ DEPEND[html/man7/ossl-guide-tls-introduction.html]=man7/ossl-guide-tls-introduct
 GENERATE[html/man7/ossl-guide-tls-introduction.html]=man7/ossl-guide-tls-introduction.pod
 DEPEND[man/man7/ossl-guide-tls-introduction.7]=man7/ossl-guide-tls-introduction.pod
 GENERATE[man/man7/ossl-guide-tls-introduction.7]=man7/ossl-guide-tls-introduction.pod
+DEPEND[html/man7/ossl-guide-tls-server-block.html]=man7/ossl-guide-tls-server-block.pod
+GENERATE[html/man7/ossl-guide-tls-server-block.html]=man7/ossl-guide-tls-server-block.pod
+DEPEND[man/man7/ossl-guide-tls-server-block.7]=man7/ossl-guide-tls-server-block.pod
+GENERATE[man/man7/ossl-guide-tls-server-block.7]=man7/ossl-guide-tls-server-block.pod
 DEPEND[html/man7/ossl_store-file.html]=man7/ossl_store-file.pod
 GENERATE[html/man7/ossl_store-file.html]=man7/ossl_store-file.pod
 DEPEND[man/man7/ossl_store-file.7]=man7/ossl_store-file.pod
@@ -5010,6 +5112,7 @@ html/man7/EVP_PKEY-X25519.html \
 html/man7/EVP_RAND-CTR-DRBG.html \
 html/man7/EVP_RAND-HASH-DRBG.html \
 html/man7/EVP_RAND-HMAC-DRBG.html \
+html/man7/EVP_RAND-JITTER.html \
 html/man7/EVP_RAND-SEED-SRC.html \
 html/man7/EVP_RAND-TEST-RAND.html \
 html/man7/EVP_RAND.html \
@@ -5023,6 +5126,7 @@ html/man7/OSSL_PROVIDER-base.html \
 html/man7/OSSL_PROVIDER-default.html \
 html/man7/OSSL_PROVIDER-legacy.html \
 html/man7/OSSL_PROVIDER-null.html \
+html/man7/OSSL_STORE-winstore.html \
 html/man7/RAND.html \
 html/man7/RSA-PSS.html \
 html/man7/X25519.html \
@@ -5058,6 +5162,7 @@ html/man7/ossl-guide-quic-multi-stream.html \
 html/man7/ossl-guide-tls-client-block.html \
 html/man7/ossl-guide-tls-client-non-block.html \
 html/man7/ossl-guide-tls-introduction.html \
+html/man7/ossl-guide-tls-server-block.html \
 html/man7/ossl_store-file.html \
 html/man7/ossl_store.html \
 html/man7/passphrase-encoding.html \
@@ -5153,6 +5258,7 @@ man/man7/EVP_PKEY-X25519.7 \
 man/man7/EVP_RAND-CTR-DRBG.7 \
 man/man7/EVP_RAND-HASH-DRBG.7 \
 man/man7/EVP_RAND-HMAC-DRBG.7 \
+man/man7/EVP_RAND-JITTER.7 \
 man/man7/EVP_RAND-SEED-SRC.7 \
 man/man7/EVP_RAND-TEST-RAND.7 \
 man/man7/EVP_RAND.7 \
@@ -5166,6 +5272,7 @@ man/man7/OSSL_PROVIDER-base.7 \
 man/man7/OSSL_PROVIDER-default.7 \
 man/man7/OSSL_PROVIDER-legacy.7 \
 man/man7/OSSL_PROVIDER-null.7 \
+man/man7/OSSL_STORE-winstore.7 \
 man/man7/RAND.7 \
 man/man7/RSA-PSS.7 \
 man/man7/X25519.7 \
@@ -5201,6 +5308,7 @@ man/man7/ossl-guide-quic-multi-stream.7 \
 man/man7/ossl-guide-tls-client-block.7 \
 man/man7/ossl-guide-tls-client-non-block.7 \
 man/man7/ossl-guide-tls-introduction.7 \
+man/man7/ossl-guide-tls-server-block.7 \
 man/man7/ossl_store-file.7 \
 man/man7/ossl_store.7 \
 man/man7/passphrase-encoding.7 \

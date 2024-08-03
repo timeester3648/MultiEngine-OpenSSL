@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2023 The OpenSSL Project Authors. All Rights Reserved.
+ * Copyright 2011-2024 The OpenSSL Project Authors. All Rights Reserved.
  *
  * Licensed under the Apache License 2.0 (the "License").  You may not use
  * this file except in compliance with the License.  You can obtain a copy
@@ -625,6 +625,7 @@ static int drbg_ctr_new(PROV_DRBG *drbg)
 
     ctr->use_df = 1;
     drbg->data = ctr;
+    OSSL_FIPS_IND_INIT(drbg)
     return drbg_ctr_init_lengths(drbg);
 }
 
@@ -697,6 +698,7 @@ static const OSSL_PARAM *drbg_ctr_gettable_ctx_params(ossl_unused void *vctx,
         OSSL_PARAM_utf8_string(OSSL_DRBG_PARAM_CIPHER, NULL, 0),
         OSSL_PARAM_int(OSSL_DRBG_PARAM_USE_DF, NULL),
         OSSL_PARAM_DRBG_GETTABLE_CTX_COMMON,
+        OSSL_FIPS_IND_GETTABLE_CTX_PARAM()
         OSSL_PARAM_END
     };
     return known_gettable_ctx_params;

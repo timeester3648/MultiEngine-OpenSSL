@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The OpenSSL Project Authors. All Rights Reserved.
+ * Copyright 2022-2024 The OpenSSL Project Authors. All Rights Reserved.
  *
  * Licensed under the Apache License 2.0 (the "License").  You may not use
  * this file except in compliance with the License.  You can obtain a copy
@@ -143,6 +143,15 @@ typedef void (*fp_pz_type)(OSSL_JSON_ENC *, const void *, size_t);
         };                                                                     \
         return &script_info;                                                   \
     }
+
+#ifdef OPENSSL_SYS_VMS
+/*
+ * The VMS C compiler recognises \u in strings, and emits a warning, which
+ * stops the build.  Because we think we know what we're doing, we change that
+ * particular message to be merely informational.
+ */
+# pragma message informational UCNNOMAP
+#endif
 
 #define END_SCRIPT_EXPECTING_S(s)   END_SCRIPT_EXPECTING(s, SIZE_MAX)
 #define END_SCRIPT_EXPECTING_Q(s)   END_SCRIPT_EXPECTING(#s, sizeof(#s) - 1)
@@ -427,8 +436,23 @@ END_SCRIPT_EXPECTING_S("{\"x\":")
 
 BEGIN_SCRIPT(err_utf8, "error test: only basic ASCII supported", 0)
     OPJ_STR("\x80")
-    OP_ASSERT_ERROR(1)
-END_SCRIPT_EXPECTING_S("\"")
+    OP_ASSERT_ERROR(0)
+END_SCRIPT_EXPECTING_S("\"\\u0080\"")
+
+BEGIN_SCRIPT(utf8_2, "test: valid UTF-8 2byte supported", 0)
+    OPJ_STR("low=\xc2\x80, high=\xdf\xbf")
+    OP_ASSERT_ERROR(0)
+END_SCRIPT_EXPECTING_S("\"low=\xc2\x80, high=\xdf\xbf\"")
+
+BEGIN_SCRIPT(utf8_3, "test: valid UTF-8 3byte supported", 0)
+    OPJ_STR("low=\xe0\xa0\x80, high=\xef\xbf\xbf")
+    OP_ASSERT_ERROR(0)
+END_SCRIPT_EXPECTING_S("\"low=\xe0\xa0\x80, high=\xef\xbf\xbf\"")
+
+BEGIN_SCRIPT(utf8_4, "test: valid UTF-8 4byte supported", 0)
+    OPJ_STR("low=\xf0\x90\xbf\xbf, high=\xf4\x8f\xbf\xbf")
+    OP_ASSERT_ERROR(0)
+END_SCRIPT_EXPECTING_S("\"low=\xf0\x90\xbf\xbf, high=\xf4\x8f\xbf\xbf\"")
 
 BEGIN_SCRIPT(ijson_int, "I-JSON: large integer", OSSL_JSON_FLAG_IJSON)
     OPJ_BEGIN_A()
@@ -508,6 +532,9 @@ static const info_func scripts[] = {
     SCRIPT(err_obj_multi_key)
     SCRIPT(err_obj_no_value)
     SCRIPT(err_utf8)
+    SCRIPT(utf8_2)
+    SCRIPT(utf8_3)
+    SCRIPT(utf8_4)
     SCRIPT(ijson_int)
     SCRIPT(multi_item)
     SCRIPT(seq)

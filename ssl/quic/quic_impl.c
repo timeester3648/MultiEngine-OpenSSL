@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 The OpenSSL Project Authors. All Rights Reserved.
+ * Copyright 2022-2024 The OpenSSL Project Authors. All Rights Reserved.
  *
  * Licensed under the Apache License 2.0 (the "License").  You may not use
  * this file except in compliance with the License.  You can obtain a copy
@@ -25,7 +25,7 @@ static void aon_write_finish(QUIC_XSO *xso);
 static int create_channel(QUIC_CONNECTION *qc);
 static QUIC_XSO *create_xso_from_stream(QUIC_CONNECTION *qc, QUIC_STREAM *qs);
 static int qc_try_create_default_xso_for_write(QCTX *ctx);
-static int qc_wait_for_default_xso_for_read(QCTX *ctx);
+static int qc_wait_for_default_xso_for_read(QCTX *ctx, int peek);
 static void quic_lock(QUIC_CONNECTION *qc);
 static void quic_unlock(QUIC_CONNECTION *qc);
 static void quic_lock_for_io(QCTX *ctx);
@@ -268,7 +268,7 @@ static int ossl_unused expect_quic_with_stream_lock(const SSL *s, int remote_ini
             if (!qc_try_create_default_xso_for_write(ctx))
                 goto err;
         } else {
-            if (!qc_wait_for_default_xso_for_read(ctx))
+            if (!qc_wait_for_default_xso_for_read(ctx, /*peek=*/0))
                 goto err;
         }
 
@@ -1851,7 +1851,7 @@ static int quic_wait_for_stream(void *arg)
 }
 
 QUIC_NEEDS_LOCK
-static int qc_wait_for_default_xso_for_read(QCTX *ctx)
+static int qc_wait_for_default_xso_for_read(QCTX *ctx, int peek)
 {
     /* Called on a QCSO and we don't currently have a default stream. */
     uint64_t expect_id;
@@ -1893,6 +1893,9 @@ static int qc_wait_for_default_xso_for_read(QCTX *ctx)
     }
 
     if (qs == NULL) {
+        if (peek)
+            return 0;
+
         if (!qc_blocking_mode(qc))
             /* Non-blocking mode, so just bail immediately. */
             return QUIC_RAISE_NORMAL_ERROR(ctx, SSL_ERROR_WANT_READ);
@@ -2469,6 +2472,11 @@ static int quic_write_nonblocking_epw(QCTX *ctx, const void *buf, size_t len,
 
     quic_post_write(xso, *written > 0, *written == len, flags,
                     qctx_should_autotick(ctx));
+
+    if (*written == 0)
+        /* SSL_write_ex returns 0 if it didn't read anything. */
+        return QUIC_RAISE_NORMAL_ERROR(ctx, SSL_ERROR_WANT_READ);
+
     return 1;
 }
 
@@ -2524,10 +2532,19 @@ int ossl_quic_write_flags(SSL *s, const void *buf, size_t len,
 
     *written = 0;
 
-    if (!expect_quic_with_stream_lock(s, /*remote_init=*/0, /*io=*/1, &ctx))
-        return 0;
+    if (len == 0) {
+        /* Do not autocreate default XSO for zero-length writes. */
+        if (!expect_quic(s, &ctx))
+            return 0;
 
-    partial_write = ((ctx.xso->ssl_mode & SSL_MODE_ENABLE_PARTIAL_WRITE) != 0);
+        quic_lock_for_io(&ctx);
+    } else {
+        if (!expect_quic_with_stream_lock(s, /*remote_init=*/0, /*io=*/1, &ctx))
+            return 0;
+    }
+
+    partial_write = ((ctx.xso != NULL)
+        ? ((ctx.xso->ssl_mode & SSL_MODE_ENABLE_PARTIAL_WRITE) != 0) : 0);
 
     if ((flags & ~SSL_WRITE_FLAG_CONCLUDE) != 0) {
         ret = QUIC_RAISE_NON_NORMAL_ERROR(&ctx, SSL_R_UNSUPPORTED_WRITE_FLAG, NULL);
@@ -2549,7 +2566,7 @@ int ossl_quic_write_flags(SSL *s, const void *buf, size_t len,
     }
 
     /* Ensure correct stream state, stream send part not concluded, etc. */
-    if (!quic_validate_for_write(ctx.xso, &err)) {
+    if (len > 0 && !quic_validate_for_write(ctx.xso, &err)) {
         ret = QUIC_RAISE_NON_NORMAL_ERROR(&ctx, err, NULL);
         goto out;
     }
@@ -2753,7 +2770,7 @@ static int quic_read(SSL *s, void *buf, size_t len, size_t *bytes_read, int peek
          * Wait until we get a stream initiated by the peer (blocking mode) or
          * fail if we don't have one yet (non-blocking mode).
          */
-        if (!qc_wait_for_default_xso_for_read(&ctx)) {
+        if (!qc_wait_for_default_xso_for_read(&ctx, /*peek=*/0)) {
             ret = 0; /* error already raised here */
             goto out;
         }
@@ -2840,8 +2857,6 @@ static size_t ossl_quic_pending_int(const SSL *s, int check_channel)
 {
     QCTX ctx;
     size_t avail = 0;
-    int fin = 0;
-
 
     if (!expect_quic(s, &ctx))
         return 0;
@@ -2849,21 +2864,28 @@ static size_t ossl_quic_pending_int(const SSL *s, int check_channel)
     quic_lock(ctx.qc);
 
     if (ctx.xso == NULL) {
-        QUIC_RAISE_NON_NORMAL_ERROR(&ctx, SSL_R_NO_STREAM, NULL);
-        goto out;
+        /* No XSO yet, but there might be a default XSO eligible to be created. */
+        if (qc_wait_for_default_xso_for_read(&ctx, /*peek=*/1)) {
+            ctx.xso = ctx.qc->default_xso;
+        } else {
+            QUIC_RAISE_NON_NORMAL_ERROR(&ctx, SSL_R_NO_STREAM, NULL);
+            goto out;
+        }
     }
 
-    if (ctx.xso->stream == NULL
-        || !ossl_quic_stream_has_recv_buffer(ctx.xso->stream)) {
+    if (ctx.xso->stream == NULL) {
         QUIC_RAISE_NON_NORMAL_ERROR(&ctx, ERR_R_INTERNAL_ERROR, NULL);
         goto out;
     }
 
-    if (!ossl_quic_rstream_available(ctx.xso->stream->rstream, &avail, &fin))
-        avail = 0;
-
-    if (avail == 0 && check_channel && ossl_quic_channel_has_pending(ctx.qc->ch))
-        avail = 1;
+    if (check_channel)
+        avail = ossl_quic_stream_recv_pending(ctx.xso->stream,
+                                              /*include_fin=*/1)
+             || ossl_quic_channel_has_pending(ctx.qc->ch)
+             || ossl_quic_channel_is_term_any(ctx.qc->ch);
+    else
+        avail = ossl_quic_stream_recv_pending(ctx.xso->stream,
+                                              /*include_fin=*/0);
 
 out:
     quic_unlock(ctx.qc);
@@ -3371,11 +3393,50 @@ err:
     return ret;
 }
 
+QUIC_TAKES_LOCK
+static int qc_get_stream_write_buf_stat(QCTX *ctx, uint32_t class_,
+                                        uint64_t *p_value_out,
+                                        size_t (*getter)(QUIC_SSTREAM *sstream))
+{
+    int ret = 0;
+    size_t value = 0;
+
+    quic_lock(ctx->qc);
+
+    if (class_ != SSL_VALUE_CLASS_GENERIC) {
+        QUIC_RAISE_NON_NORMAL_ERROR(ctx, SSL_R_UNSUPPORTED_CONFIG_VALUE_CLASS,
+                                    NULL);
+        goto err;
+    }
+
+    if (ctx->xso == NULL) {
+        QUIC_RAISE_NON_NORMAL_ERROR(ctx, SSL_R_NO_STREAM, NULL);
+        goto err;
+    }
+
+    if (!ossl_quic_stream_has_send(ctx->xso->stream)) {
+        QUIC_RAISE_NON_NORMAL_ERROR(ctx, SSL_R_STREAM_RECV_ONLY, NULL);
+        goto err;
+    }
+
+    if (ossl_quic_stream_has_send_buffer(ctx->xso->stream))
+        value = getter(ctx->xso->stream->sstream);
+
+    ret = 1;
+err:
+    quic_unlock(ctx->qc);
+    *p_value_out = (uint64_t)value;
+    return ret;
+}
+
 QUIC_NEEDS_LOCK
 static int expect_quic_for_value(SSL *s, QCTX *ctx, uint32_t id)
 {
     switch (id) {
     case SSL_VALUE_EVENT_HANDLING_MODE:
+    case SSL_VALUE_STREAM_WRITE_BUF_SIZE:
+    case SSL_VALUE_STREAM_WRITE_BUF_USED:
+    case SSL_VALUE_STREAM_WRITE_BUF_AVAIL:
         return expect_quic(s, ctx);
     default:
         return expect_quic_conn_only(s, ctx);
@@ -3410,6 +3471,16 @@ int ossl_quic_get_value_uint(SSL *s, uint32_t class_, uint32_t id,
 
     case SSL_VALUE_EVENT_HANDLING_MODE:
         return qc_getset_event_handling(&ctx, class_, value, NULL);
+
+    case SSL_VALUE_STREAM_WRITE_BUF_SIZE:
+        return qc_get_stream_write_buf_stat(&ctx, class_, value,
+                                            ossl_quic_sstream_get_buffer_size);
+    case SSL_VALUE_STREAM_WRITE_BUF_USED:
+        return qc_get_stream_write_buf_stat(&ctx, class_, value,
+                                            ossl_quic_sstream_get_buffer_used);
+    case SSL_VALUE_STREAM_WRITE_BUF_AVAIL:
+        return qc_get_stream_write_buf_stat(&ctx, class_, value,
+                                            ossl_quic_sstream_get_buffer_avail);
 
     default:
         return QUIC_RAISE_NON_NORMAL_ERROR(&ctx,

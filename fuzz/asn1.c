@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2022 The OpenSSL Project Authors. All Rights Reserved.
+ * Copyright 2016-2024 The OpenSSL Project Authors. All Rights Reserved.
  *
  * Licensed under the Apache License 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@
 #include <openssl/bio.h>
 #include <openssl/evp.h>
 #include <openssl/ssl.h>
+#include <openssl/x509_acert.h>
 #include "internal/nelem.h"
 #include "fuzzer.h"
 
@@ -174,6 +175,7 @@ static ASN1_ITEM_EXP *item_type[] = {
 #endif
     ASN1_ITEM_ref(SXNET),
     ASN1_ITEM_ref(SXNETID),
+    ASN1_ITEM_ref(OSSL_TARGETING_INFORMATION),
     ASN1_ITEM_ref(USERNOTICE),
     ASN1_ITEM_ref(X509),
     ASN1_ITEM_ref(X509_ALGOR),

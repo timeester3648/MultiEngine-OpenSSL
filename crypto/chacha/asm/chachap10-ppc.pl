@@ -1,5 +1,5 @@
 #! /usr/bin/env perl
-# Copyright 2016-2022 The OpenSSL Project Authors. All Rights Reserved.
+# Copyright 2016-2024 The OpenSSL Project Authors. All Rights Reserved.
 #
 # Licensed under the Apache License 2.0 (the "License").  You may not use
 # this file except in compliance with the License.  You can obtain a copy
@@ -787,7 +787,7 @@ $code.=<<___;
 
 	vxxlor	        $xv6  ,$xb6,$xb6                # save vr23, so we get 8 regs
 	vxxlor	        $xv7  ,$xb7,$xb7                # save vr23, so we get 8 regs
-	be?vxxlorc      $beperm,$xv26,$xv26             # copy back the the beperm.
+	be?vxxlorc      $beperm,$xv26,$xv26             # copy back the beperm.
 
 	vxxlorc	   @K[0],$xv0,$xv0                #27
 	vxxlorc	   @K[1],$xv1,$xv1 		  #24

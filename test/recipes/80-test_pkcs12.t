@@ -1,5 +1,5 @@
 #! /usr/bin/env perl
-# Copyright 2016-2022 The OpenSSL Project Authors. All Rights Reserved.
+# Copyright 2016-2024 The OpenSSL Project Authors. All Rights Reserved.
 #
 # Licensed under the Apache License 2.0 (the "License").  You may not use
 # this file except in compliance with the License.  You can obtain a copy
@@ -54,7 +54,7 @@ if (eval { require Win32::API; 1; }) {
 }
 $ENV{OPENSSL_WIN32_UTF8}=1;
 
-plan tests => 28;
+plan tests => 31;
 
 # Test different PKCS#12 formats
 ok(run(test(["pkcs12_format_test"])), "test pkcs12 formats");
@@ -184,11 +184,23 @@ with({ exit_checker => sub { return shift == 1; } },
                     "-nomacver"])),
            "test bad pkcs12 file 1 (nomacver)");
 
+        ok(run(app(["openssl", "pkcs12", "-in", $bad1, "-password", "pass:",
+                    "-info"])),
+           "test bad pkcs12 file 1 (info)");
+
         ok(run(app(["openssl", "pkcs12", "-in", $bad2, "-password", "pass:"])),
            "test bad pkcs12 file 2");
 
+        ok(run(app(["openssl", "pkcs12", "-in", $bad2, "-password", "pass:",
+                    "-info"])),
+           "test bad pkcs12 file 2 (info)");
+
         ok(run(app(["openssl", "pkcs12", "-in", $bad3, "-password", "pass:"])),
            "test bad pkcs12 file 3");
+
+        ok(run(app(["openssl", "pkcs12", "-in", $bad3, "-password", "pass:",
+                    "-info"])),
+           "test bad pkcs12 file 3 (info)");
      });
 
 # Test with Oracle Trusted Key Usage specified in openssl.cnf
