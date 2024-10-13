@@ -211,7 +211,7 @@ CRYPTO_mem_debug_push(), and CRYPTO_mem_debug_pop()
 are deprecated and are no-ops that always return 0.
 
 OPENSSL_strtoul() returns 1 on success and 0 in the event that an error has
-occured. Specifically, 0 is returned in the following events:
+occurred. Specifically, 0 is returned in the following events:
 
 =over 4
 
@@ -231,7 +231,7 @@ If no characters were consumed in the translation
 =back
 
 Note that a success condition does not imply that the expected
-translation has been preformed.  For instance calling
+translation has been performed.  For instance calling
 
     OPENSSL_strtoul("0x12345", &endptr, 10, &num);
 
@@ -252,7 +252,7 @@ OPENSSL_aligned_alloc(), CRYPTO_aligned_alloc() were added in OpenSSL 3.4.0
 
 =head1 COPYRIGHT
 
-Copyright 2016-2021 The OpenSSL Project Authors. All Rights Reserved.
+Copyright 2016-2024 The OpenSSL Project Authors. All Rights Reserved.
 
 Licensed under the Apache License 2.0 (the "License").  You may not use
 this file except in compliance with the License.  You can obtain a copy

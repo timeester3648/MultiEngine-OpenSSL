@@ -1,5 +1,5 @@
 /*
- * Copyright 1995-2023 The OpenSSL Project Authors. All Rights Reserved.
+ * Copyright 1995-2024 The OpenSSL Project Authors. All Rights Reserved.
  * Copyright 2005 Nokia. All rights reserved.
  *
  * Licensed under the Apache License 2.0 (the "License").  You may not use
@@ -16,6 +16,7 @@
 #include <errno.h>
 #include <openssl/e_os2.h>
 #include "internal/nelem.h"
+#include "internal/sockets.h" /* for openssl_fdset() */
 
 #ifndef OPENSSL_NO_SOCK
 
@@ -3486,6 +3487,7 @@ static void print_stuff(BIO *bio, SSL *s, int full)
     c = SSL_get_current_cipher(s);
     BIO_printf(bio, "%s, Cipher is %s\n",
                SSL_CIPHER_get_version(c), SSL_CIPHER_get_name(c));
+    BIO_printf(bio, "Protocol: %s\n", SSL_get_version(s));
     if (peer != NULL) {
         EVP_PKEY *pktmp;
 

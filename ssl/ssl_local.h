@@ -12,7 +12,6 @@
 #ifndef OSSL_SSL_LOCAL_H
 # define OSSL_SSL_LOCAL_H
 
-# include "internal/e_os.h"              /* struct timeval for DTLS */
 # include <stdlib.h>
 # include <time.h>
 # include <errno.h>
@@ -79,12 +78,8 @@
 # define SSL_kRSA                0x00000001U
 /* tmp DH key no DH cert */
 # define SSL_kDHE                0x00000002U
-/* synonym */
-# define SSL_kEDH                SSL_kDHE
 /* ephemeral ECDH */
 # define SSL_kECDHE              0x00000004U
-/* synonym */
-# define SSL_kEECDH              SSL_kECDHE
 /* PSK */
 # define SSL_kPSK                0x00000008U
 /* GOST key exchange */
@@ -368,12 +363,6 @@
  * SSL_aRSA <- RSA_ENC | RSA_SIGN
  * SSL_aDSS <- DSA_SIGN
  */
-
-/*-
-#define CERT_INVALID            0
-#define CERT_PUBLIC_KEY         1
-#define CERT_PRIVATE_KEY        2
-*/
 
 /* Certificate Type State */
 # define OSSL_CERT_TYPE_CTOS_NONE    0
@@ -1871,12 +1860,6 @@ typedef struct sigalg_lookup_st {
 /* Max MTU overhead we know about so far is 40 for IPv6 + 8 for UDP */
 # define DTLS1_MAX_MTU_OVERHEAD                   48
 
-/*
- * Flag used in message reuse to indicate the buffer contains the record
- * header as well as the handshake message header.
- */
-# define DTLS1_SKIP_RECORD_HEADER                 2
-
 struct dtls1_retransmit_state {
     const OSSL_RECORD_METHOD *wrlmethod;
     OSSL_RECORD_LAYER *wrl;
@@ -2111,8 +2094,6 @@ typedef struct cert_st {
     CRYPTO_REF_COUNT references;             /* >1 only if SSL_copy_session_id is used */
 } CERT;
 
-# define FP_ICC  (int (*)(const void *,const void *))
-
 /*
  * This is for the SSLv3/TLSv1.0 differences in crypto/hash stuff It is a bit
  * of a mess of functions, but hell, think of it as an opaque structure :-)
@@ -2209,6 +2190,40 @@ typedef enum downgrade_en {
 #define TLSEXT_SIGALG_ecdsa_brainpoolP384r1_sha384              0x081b
 #define TLSEXT_SIGALG_ecdsa_brainpoolP512r1_sha512              0x081c
 
+/* Sigalgs names */
+#define TLSEXT_SIGALG_ecdsa_secp256r1_sha256_name                    "ecdsa_secp256r1_sha256"
+#define TLSEXT_SIGALG_ecdsa_secp384r1_sha384_name                    "ecdsa_secp384r1_sha384"
+#define TLSEXT_SIGALG_ecdsa_secp521r1_sha512_name                    "ecdsa_secp521r1_sha512"
+#define TLSEXT_SIGALG_ecdsa_sha224_name                              "ecdsa_sha224"
+#define TLSEXT_SIGALG_ecdsa_sha1_name                                "ecdsa_sha1"
+#define TLSEXT_SIGALG_rsa_pss_rsae_sha256_name                       "rsa_pss_rsae_sha256"
+#define TLSEXT_SIGALG_rsa_pss_rsae_sha384_name                       "rsa_pss_rsae_sha384"
+#define TLSEXT_SIGALG_rsa_pss_rsae_sha512_name                       "rsa_pss_rsae_sha512"
+#define TLSEXT_SIGALG_rsa_pss_pss_sha256_name                        "rsa_pss_pss_sha256"
+#define TLSEXT_SIGALG_rsa_pss_pss_sha384_name                        "rsa_pss_pss_sha384"
+#define TLSEXT_SIGALG_rsa_pss_pss_sha512_name                        "rsa_pss_pss_sha512"
+#define TLSEXT_SIGALG_rsa_pkcs1_sha256_name                          "rsa_pkcs1_sha256"
+#define TLSEXT_SIGALG_rsa_pkcs1_sha384_name                          "rsa_pkcs1_sha384"
+#define TLSEXT_SIGALG_rsa_pkcs1_sha512_name                          "rsa_pkcs1_sha512"
+#define TLSEXT_SIGALG_rsa_pkcs1_sha224_name                          "rsa_pkcs1_sha224"
+#define TLSEXT_SIGALG_rsa_pkcs1_sha1_name                            "rsa_pkcs1_sha1"
+#define TLSEXT_SIGALG_dsa_sha256_name                                "dsa_sha256"
+#define TLSEXT_SIGALG_dsa_sha384_name                                "dsa_sha384"
+#define TLSEXT_SIGALG_dsa_sha512_name                                "dsa_sha512"
+#define TLSEXT_SIGALG_dsa_sha224_name                                "dsa_sha224"
+#define TLSEXT_SIGALG_dsa_sha1_name                                  "dsa_sha1"
+#define TLSEXT_SIGALG_gostr34102012_256_intrinsic_name               "gost2012_256"
+#define TLSEXT_SIGALG_gostr34102012_512_intrinsic_name               "gost2012_512"
+#define TLSEXT_SIGALG_gostr34102012_256_gostr34112012_256_name       "gost2012_256"
+#define TLSEXT_SIGALG_gostr34102012_512_gostr34112012_512_name       "gost2012_512"
+#define TLSEXT_SIGALG_gostr34102001_gostr3411_name                   "gost2001_gost94"
+
+#define TLSEXT_SIGALG_ed25519_name                                   "ed25519"
+#define TLSEXT_SIGALG_ed448_name                                     "ed448"
+#define TLSEXT_SIGALG_ecdsa_brainpoolP256r1_sha256_name              "ecdsa_brainpoolP256r1_sha256"
+#define TLSEXT_SIGALG_ecdsa_brainpoolP384r1_sha384_name              "ecdsa_brainpoolP384r1_sha384"
+#define TLSEXT_SIGALG_ecdsa_brainpoolP512r1_sha512_name              "ecdsa_brainpoolP512r1_sha512"
+
 /* Known PSK key exchange modes */
 #define TLSEXT_KEX_MODE_KE                                      0x00
 #define TLSEXT_KEX_MODE_KE_DHE                                  0x01
@@ -2222,9 +2237,6 @@ typedef enum downgrade_en {
 
 #define SSL_USE_PSS(s) (s->s3.tmp.peer_sigalg != NULL && \
                         s->s3.tmp.peer_sigalg->sig == EVP_PKEY_RSA_PSS)
-
-/* A dummy signature value not valid for TLSv1.2 signature algs */
-#define TLSEXT_signature_rsa_pss                                0x0101
 
 /* TLSv1.3 downgrade protection sentinel values */
 extern const unsigned char tls11downgrade[8];
@@ -2538,7 +2550,6 @@ __owur const SSL_CERT_LOOKUP *ssl_cert_lookup_by_idx(size_t idx, SSL_CTX *ctx);
 
 int ssl_undefined_function(SSL *s);
 __owur int ssl_undefined_void_function(void);
-__owur int ssl_undefined_const_function(const SSL *s);
 __owur int ssl_get_server_cert_serverinfo(SSL_CONNECTION *s,
                                           const unsigned char **serverinfo,
                                           size_t *serverinfo_length);
@@ -2911,8 +2922,6 @@ __owur int custom_exts_copy(custom_ext_methods *dst,
 __owur int custom_exts_copy_flags(custom_ext_methods *dst,
                                   const custom_ext_methods *src);
 void custom_exts_free(custom_ext_methods *exts);
-
-void ssl_comp_free_compression_methods_int(void);
 
 /* ssl_mcnf.c */
 int ssl_ctx_system_config(SSL_CTX *ctx);

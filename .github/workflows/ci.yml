@@ -81,6 +81,9 @@ jobs:
       run: git submodule update --init --depth 1 fuzz/corpora
     - name: localegen
       run: sudo locale-gen tr_TR.UTF-8
+    - name: fipsvendor
+      # Make one fips build use a customized FIPS vendor
+      run: echo "FIPS_VENDOR=CI" >> VERSION.dat
     - name: config
       # enable-quic is on by default, but we leave it here to check we're testing the explicit enable somewhere
       run: CC=gcc ./config --banner=Configured enable-demos enable-h3demo enable-fips enable-quic --strict-warnings && perl configdata.pm --dump
@@ -92,6 +95,9 @@ jobs:
         ./util/opensslwrap.sh version -c
     - name: make test
       run: .github/workflows/make-test
+    - name: check fipsvendor
+      run: |
+        util/wrap.pl -fips apps/openssl list -providers | grep 'name: CI FIPS Provider for OpenSSL$'
     - name: save artifacts
       uses: actions/upload-artifact@v3
       with:
@@ -567,7 +573,7 @@ jobs:
     - name: package installs
       run: |
         sudo apt-get update
-        sudo apt-get -yq install bison gettext keyutils ldap-utils libldap2-dev libkeyutils-dev python3 python3-paste python3-pyrad slapd tcsh python3-virtualenv virtualenv python3-kdcproxy
+        sudo apt-get -yq install bison gettext keyutils ldap-utils libldap2-dev libkeyutils-dev python3 python3-paste python3-pyrad slapd tcsh python3-virtualenv virtualenv python3-kdcproxy gdb
     - name: install cpanm and Test2::V0 for gost_engine testing
       uses: perl-actions/install-with-cpanm@stable
       with:
@@ -590,6 +596,11 @@ jobs:
       run: make test TESTS="test_external_tlsfuzzer"
     - name: test external oqs-provider
       run: make test TESTS="test_external_oqsprovider"
+    - name: test ability to produce debuginfo files
+      run: |
+        make debuginfo
+        gdb < <(echo -e "file ./libcrypto.so.3\nquit") > ./results
+        grep -q "Reading symbols from.*libcrypto\.so\.3\.debug" results
 
   external-test-pyca:
     runs-on: ${{ github.server_url == 'https://github.com' && 'ubuntu-latest' || 'ubuntu-22.04-self-hosted' }}
@@ -608,7 +619,7 @@ jobs:
     - name: make
       run: make -s -j4
     - name: Setup Python
-      uses: actions/setup-python@v5.1.1
+      uses: actions/setup-python@v5.2.0
       with:
         python-version: ${{ matrix.PYTHON }}
     - uses: dtolnay/rust-toolchain@master

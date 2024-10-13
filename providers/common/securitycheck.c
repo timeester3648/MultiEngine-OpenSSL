@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2023 The OpenSSL Project Authors. All Rights Reserved.
+ * Copyright 2020-2024 The OpenSSL Project Authors. All Rights Reserved.
  *
  * Licensed under the Apache License 2.0 (the "License").  You may not use
  * this file except in compliance with the License.  You can obtain a copy
@@ -19,37 +19,40 @@
 #include <openssl/core_names.h>
 #include <openssl/obj_mac.h>
 #include "prov/securitycheck.h"
-#include "prov/fipsindicator.h"
+
+#define OSSL_FIPS_MIN_SECURITY_STRENGTH_BITS 112
 
 int ossl_rsa_key_op_get_protect(const RSA *rsa, int operation, int *outprotect)
 {
     int protect = 0;
 
     switch (operation) {
-        case EVP_PKEY_OP_SIGN:
-            protect = 1;
-            /* fallthrough */
-        case EVP_PKEY_OP_VERIFY:
-            break;
-        case EVP_PKEY_OP_ENCAPSULATE:
-        case EVP_PKEY_OP_ENCRYPT:
-            protect = 1;
-            /* fallthrough */
-        case EVP_PKEY_OP_VERIFYRECOVER:
-        case EVP_PKEY_OP_DECAPSULATE:
-        case EVP_PKEY_OP_DECRYPT:
-            if (RSA_test_flags(rsa,
-                               RSA_FLAG_TYPE_MASK) == RSA_FLAG_TYPE_RSASSAPSS) {
-                ERR_raise_data(ERR_LIB_PROV,
-                               PROV_R_OPERATION_NOT_SUPPORTED_FOR_THIS_KEYTYPE,
-                               "operation: %d", operation);
-                return 0;
-            }
-            break;
-        default:
-            ERR_raise_data(ERR_LIB_PROV, ERR_R_INTERNAL_ERROR,
-                           "invalid operation: %d", operation);
+    case EVP_PKEY_OP_SIGN:
+    case EVP_PKEY_OP_SIGNMSG:
+        protect = 1;
+        /* fallthrough */
+    case EVP_PKEY_OP_VERIFY:
+    case EVP_PKEY_OP_VERIFYMSG:
+        break;
+    case EVP_PKEY_OP_ENCAPSULATE:
+    case EVP_PKEY_OP_ENCRYPT:
+        protect = 1;
+        /* fallthrough */
+    case EVP_PKEY_OP_VERIFYRECOVER:
+    case EVP_PKEY_OP_DECAPSULATE:
+    case EVP_PKEY_OP_DECRYPT:
+        if (RSA_test_flags(rsa,
+                           RSA_FLAG_TYPE_MASK) == RSA_FLAG_TYPE_RSASSAPSS) {
+            ERR_raise_data(ERR_LIB_PROV,
+                           PROV_R_OPERATION_NOT_SUPPORTED_FOR_THIS_KEYTYPE,
+                           "operation: %d", operation);
             return 0;
+        }
+        break;
+    default:
+        ERR_raise_data(ERR_LIB_PROV, ERR_R_INTERNAL_ERROR,
+                       "invalid operation: %d", operation);
+        return 0;
     }
     *outprotect = protect;
     return 1;
@@ -76,7 +79,12 @@ int ossl_rsa_check_key_size(const RSA *rsa, int protect)
  */
 int ossl_kdf_check_key_size(size_t keylen)
 {
-    return (keylen * 8) >= 112;
+    return (keylen * 8) >= OSSL_FIPS_MIN_SECURITY_STRENGTH_BITS;
+}
+
+int ossl_mac_check_key_size(size_t keylen)
+{
+    return ossl_kdf_check_key_size(keylen);
 }
 
 #ifndef OPENSSL_NO_EC
@@ -86,7 +94,7 @@ int ossl_ec_check_curve_allowed(const EC_GROUP *group)
     const char *curve_name;
     int nid = EC_GROUP_get_curve_name(group);
 
-    /* Explict curves are not FIPS approved */
+    /* Explicit curves are not FIPS approved */
     if (nid == NID_undef)
         return 0;
     /* Only NIST curves are FIPS approved */
@@ -124,7 +132,7 @@ int ossl_ec_check_security_strength(const EC_GROUP *group, int protect)
      * For signing or key agreement only allow curves with at least 112 bits of
      * security strength
      */
-    if (protect && strength < 112)
+    if (protect && strength < OSSL_FIPS_MIN_SECURITY_STRENGTH_BITS)
         return 0;
     return 1;
 }

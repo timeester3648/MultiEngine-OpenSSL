@@ -818,6 +818,8 @@ int evp_keymgmt_gen_set_template(const EVP_KEYMGMT *keymgmt, void *genctx,
                                  void *templ);
 int evp_keymgmt_gen_set_params(const EVP_KEYMGMT *keymgmt, void *genctx,
                                const OSSL_PARAM params[]);
+int evp_keymgmt_gen_get_params(const EVP_KEYMGMT *keymgmt,
+                               void *genctx, OSSL_PARAM params[]);
 void *evp_keymgmt_gen(const EVP_KEYMGMT *keymgmt, void *genctx,
                       OSSL_CALLBACK *cb, void *cbarg);
 void evp_keymgmt_gen_cleanup(const EVP_KEYMGMT *keymgmt, void *genctx);
@@ -961,5 +963,8 @@ int evp_signature_get_number(const EVP_SIGNATURE *signature);
 int evp_pkey_decrypt_alloc(EVP_PKEY_CTX *ctx, unsigned char **outp,
                            size_t *outlenp, size_t expected_outlen,
                            const unsigned char *in, size_t inlen);
+
+int ossl_md2hmacnid(int mdnid);
+int ossl_hmac2mdnid(int hmac_nid);
 
 #endif /* OSSL_CRYPTO_EVP_H */

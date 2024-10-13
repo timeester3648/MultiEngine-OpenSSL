@@ -1,5 +1,5 @@
 #
-# Copyright 2001-2020 The OpenSSL Project Authors. All Rights Reserved.
+# Copyright 2001-2024 The OpenSSL Project Authors. All Rights Reserved.
 #
 # Licensed under the Apache License 2.0 (the "License").  You may not use
 # this file except in compliance with the License.  You can obtain a copy
@@ -4876,7 +4876,9 @@ Ctrl.hexxcghash = hexxcghash:a4ebd45934f56792b5112dcd75a1075fdc889245
 Ctrl.hexsession_id = hexsession_id:a4ebd45934f56792b5112dcd75a1075fdc889245
 Ctrl.type = type:A
 Result = KDF_CTRL_ERROR
+Reason = xof digests not allowed
 
+Availablein = fips
 FIPSversion = <3.4.0
 KDF = SSHKDF
 Ctrl.digest = digest:SHAKE-256
@@ -4889,6 +4891,7 @@ Result = KDF_MISMATCH
 Title = FIPS indicator tests
 
 # Test that the operation with unapproved digest function is rejected
+Availablein = fips
 FIPSversion = >=3.4.0
 KDF = SSHKDF
 Ctrl.digest = digest:SHA512-256
@@ -4897,9 +4900,11 @@ Ctrl.hexxcghash = hexxcghash:a4ebd45934f56792b5112dcd75a1075fdc889245
 Ctrl.hexsession_id = hexsession_id:a4ebd45934f56792b5112dcd75a1075fdc889245
 Ctrl.type = type:A
 Result = KDF_CTRL_ERROR
+Reason = digest not allowed
 
 # Test that the operation with unapproved digest function is is reported as
 # unapproved
+Availablein = fips
 FIPSversion = >=3.4.0
 KDF = SSHKDF
 Unapproved = 1
@@ -4912,6 +4917,7 @@ Ctrl.type = type:A
 Output = d37ea221cbcc026d95e8c10b7d28a1b41e4ec1b497bae0e4cdbc1446e5bd59e2
 
 # Test that the key whose length is shorter than 112 bits is rejected
+Availablein = fips
 FIPSversion = >=3.4.0
 KDF = SSHKDF
 Ctrl.digest = digest:SHA1
@@ -4920,9 +4926,11 @@ Ctrl.hexxcghash = hexxcghash:a4ebd45934f56792b5112dcd75a1075fdc889245
 Ctrl.hexsession_id = hexsession_id:a4ebd45934f56792b5112dcd75a1075fdc889245
 Ctrl.type = type:A
 Result = KDF_CTRL_ERROR
+Reason = invalid key length
 
 # Test that the key whose length is shorter than 112 bits is reported as
 # unapproved
+Availablein = fips
 FIPSversion = >=3.4.0
 KDF = SSHKDF
 Unapproved = 1

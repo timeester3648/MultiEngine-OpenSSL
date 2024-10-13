@@ -9,9 +9,10 @@
  * https://www.openssl.org/source/license.html
  */
 
-#include <stdio.h>
-#include "ssl_local.h"
 #include "internal/e_os.h"
+#include "internal/e_winsock.h"
+#include "ssl_local.h"
+
 #include <openssl/objects.h>
 #include <openssl/x509v3.h>
 #include <openssl/rand.h>
@@ -27,6 +28,7 @@
 #include "internal/nelem.h"
 #include "internal/refcount.h"
 #include "internal/ktls.h"
+#include "internal/to_hex.h"
 #include "quic/quic_local.h"
 
 static int ssl_undefined_function_3(SSL_CONNECTION *sc, unsigned char *r,
@@ -4812,11 +4814,6 @@ int ssl_undefined_void_function(void)
     return 0;
 }
 
-int ssl_undefined_const_function(const SSL *s)
-{
-    return 0;
-}
-
 const char *ssl_protocol_to_string(int version)
 {
     switch (version) {
@@ -6750,9 +6747,7 @@ static int nss_keylog_int(const char *prefix,
 {
     char *out = NULL;
     char *cursor = NULL;
-    size_t out_len = 0;
-    size_t i;
-    size_t prefix_len;
+    size_t out_len = 0, i, prefix_len;
     SSL_CTX *sctx = SSL_CONNECTION_GET_CTX(sc);
 
     if (sctx->keylog_callback == NULL)
@@ -6771,26 +6766,21 @@ static int nss_keylog_int(const char *prefix,
     if ((out = cursor = OPENSSL_malloc(out_len)) == NULL)
         return 0;
 
-    strcpy(cursor, prefix);
+    memcpy(cursor, prefix, prefix_len);
     cursor += prefix_len;
     *cursor++ = ' ';
 
-    for (i = 0; i < parameter_1_len; i++) {
-        sprintf(cursor, "%02x", parameter_1[i]);
-        cursor += 2;
-    }
+    for (i = 0; i < parameter_1_len; ++i)
+        cursor += ossl_to_lowerhex(cursor, parameter_1[i]);
     *cursor++ = ' ';
 
-    for (i = 0; i < parameter_2_len; i++) {
-        sprintf(cursor, "%02x", parameter_2[i]);
-        cursor += 2;
-    }
+    for (i = 0; i < parameter_2_len; ++i)
+        cursor += ossl_to_lowerhex(cursor, parameter_2[i]);
     *cursor = '\0';
 
     sctx->keylog_callback(SSL_CONNECTION_GET_SSL(sc), (const char *)out);
     OPENSSL_clear_free(out, out_len);
     return 1;
-
 }
 
 int ssl_log_rsa_client_key_exchange(SSL_CONNECTION *sc,
