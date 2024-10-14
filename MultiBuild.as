@@ -22,14 +22,16 @@ void main(MultiBuild::Workspace& workspace) {
 		"./crypto/**.h",
 		"./crypto/**.c",
 
-		// "./providers/common/**.c",
-		// "./providers/implementations/ciphers/**.c",
-		// "./providers/implementations/digests/**.c",
+		"./providers/prov_running.c",
+
+		"./providers/common/**.c",
+		"./providers/implementations/kem/**.c",
+		"./providers/implementations/macs/**.c",
+		"./providers/implementations/rands/**.c",
+		"./providers/implementations/ciphers/**.c",
+		"./providers/implementations/digests/**.c",
 
 		"./engines/e_capi.c",
-
-		// "./providers/**.h",
-		// "./providers/**.c",
 
 		"./**.h.in",
 		"./**x86_64.pl",
@@ -57,6 +59,7 @@ void main(MultiBuild::Workspace& workspace) {
 		"./crypto/modes",
 		"./crypto/include",
 		"./crypto/ec/curve448",
+		"./providers/fips/include",
 		"./providers/common/include",
 		"./crypto/ec/curve448/arch_32",
 		"./providers/implementations/include"
@@ -66,18 +69,20 @@ void main(MultiBuild::Workspace& workspace) {
 		"./providers/legacyprov.c",
 		"./crypto/ec/ecp_nistz256_table.c",
 		"./crypto/rsa/rsa_acvp_test_params.c",
-		// "./providers/implementations/macs/blake2_mac_impl.c",
-		// "./providers/implementations/rands/seeding/rand_vms.c",
-		// "./providers/implementations/rands/seeding/rand_vxworks.c",
+		"./providers/implementations/macs/blake2_mac_impl.c",
+		"./providers/implementations/rands/seeding/rand_vms.c",
+		"./providers/implementations/rands/seeding/rand_vxworks.c",
 
 		"./crypto/md2/**",
 		"./crypto/rc5/**",
 		"./crypto/evp/**md2**",
+		// "./crypto/provider_core.c",
+		// "./crypto/provider_predefined.c",
 
-		// "./providers/fips/**",
-		// "./providers/common/**fips**.c",
-		// "./providers/implementations/**rc5**",
-		// "./providers/implementations/**md2**",
+		"./providers/fips/**",
+		"./providers/common/**fips**.c",
+		"./providers/implementations/**rc5**",
+		"./providers/implementations/**md2**",
 
 		"./**riscv**",
 
