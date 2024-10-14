@@ -21,6 +21,7 @@ void main(MultiBuild::Workspace& workspace) {
 		"./ssl/**.c",
 		"./crypto/**.h",
 		"./crypto/**.c",
+		"./mle_fixes/*.c",
 
 		"./providers/prov_running.c",
 
@@ -77,7 +78,7 @@ void main(MultiBuild::Workspace& workspace) {
 		"./crypto/rc5/**",
 		"./crypto/evp/**md2**",
 		// "./crypto/provider_core.c",
-		// "./crypto/provider_predefined.c",
+		"./crypto/provider_predefined.c",
 
 		"./providers/fips/**",
 		"./providers/common/**fips**.c",
